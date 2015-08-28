@@ -30,8 +30,8 @@ public class InfoLaber extends Composite {
 		
 		new MyLabel(this, SWT.NONE, ib.getSchool(),Constants.INFO_LABEL_Constant.SCHOOL);
 		new MyLabel(this, SWT.NONE, ib.getName(),Constants.INFO_LABEL_Constant.NAME);
-		new MyLabel(this, SWT.NONE, "语文",Constants.INFO_LABEL_Constant.TYPE);
-		new MyLabel(this, SWT.NONE, "教龄： 3年",Constants.INFO_LABEL_Constant.AGE);
+		new MyLabel(this, SWT.NONE, ib.getType(),Constants.INFO_LABEL_Constant.TYPE);
+		new MyLabel(this, SWT.NONE, "教龄： "+ib.getTrainAge()+"年",Constants.INFO_LABEL_Constant.AGE);
 	}
 
 }
