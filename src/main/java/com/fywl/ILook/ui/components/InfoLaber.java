@@ -28,7 +28,7 @@ public class InfoLaber extends Composite {
 		icon.setImage(ImageUtil.getInstance().getImage(this.getDisplay(),this.getClass().getResourceAsStream(
 				Constants.INFO_LABEL_Constant.ICON_URL)));
 		
-		new MyLabel(this, SWT.NONE, "北京第一中学",Constants.INFO_LABEL_Constant.SCHOOL);
+		new MyLabel(this, SWT.NONE, ib.getName(),Constants.INFO_LABEL_Constant.SCHOOL);
 		new MyLabel(this, SWT.NONE, "张三",Constants.INFO_LABEL_Constant.NAME);
 		new MyLabel(this, SWT.NONE, "语文",Constants.INFO_LABEL_Constant.TYPE);
 		new MyLabel(this, SWT.NONE, "教龄： 3年",Constants.INFO_LABEL_Constant.AGE);
