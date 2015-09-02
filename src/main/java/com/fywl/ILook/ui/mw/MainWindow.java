@@ -6,23 +6,19 @@ import org.eclipse.swt.widgets.Shell;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
-import com.fywl.ILook.bean.RecordConfig;
 
 public  class MainWindow {
 
 	protected Display display = Display.getDefault();
 
 	protected Shell shell = new Shell(display, SWT.ON_TOP);
-
-	protected RecordConfig config = new RecordConfig();
-	
 	
 	public MainWindow() {
-		init();
+		
 	}
 	
 
-	private void init() {
+	protected void init() {
 		beforeInit();
 		
 		shell.setBackgroundMode(SWT.INHERIT_DEFAULT);
@@ -36,14 +32,14 @@ public  class MainWindow {
 
 		shell.open();
 		shell.layout();
+		
+		afterInit();
+		
 		while (!shell.isDisposed()) {
 			if (!display.readAndDispatch()) {
 				display.sleep();
 			}
 		}
-
-		
-		afterInit();
 	}
 	
 	

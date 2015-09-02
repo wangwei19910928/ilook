@@ -1,6 +1,7 @@
 package com.fywl.ILook;
 
-import com.fywl.ILook.ui.mw.impl.TestMainWindow;
+import com.fywl.ILook.bean.InfoBean;
+import com.fywl.ILook.ui.mw.impl.FunctionMainWindow;
 
 
 
@@ -9,8 +10,12 @@ import com.fywl.ILook.ui.mw.impl.TestMainWindow;
 public class Server {
 
 	public static void main(String[] args) {
-
-		new TestMainWindow();
+		InfoBean ib = new InfoBean();
+		ib.setName("张三疯");
+		ib.setSchool("北京市第三中学");
+		ib.setTrainAge(3);
+		ib.setType("体育");
+		new FunctionMainWindow(ib);
 
 	}
 

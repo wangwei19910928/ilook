@@ -211,9 +211,9 @@ protected void beforeComponentsInit() {
 
 @Override
 protected void componentsInit() {
-	initTitlePanel();
+	//initTitlePanel();
 
-	initInfoLaber();
+//	initInfoLaber();
 
 	initVideoPlayBackPanel();
 
@@ -221,7 +221,7 @@ protected void componentsInit() {
 
 	initOtherVideoPlayBackPanel();
 
-	initToolPanel();
+//	initToolPanel();
 
 	createMainComp(shell);//创建主面板
     createStatusbar(toolPanel);//创建工具栏
@@ -266,13 +266,13 @@ private void toggleDisplay() {
 }
 
 // 初始化顶部logo、标题、最小化和关闭按钮
-private void initTitlePanel() {
-	Panel titlePanel = new TitlePanel(this, shell, SWT.NONE, recorder);
-	titlePanel.setLocation(Constants.TITLE_Constant.LOCATION_X,
-			Constants.TITLE_Constant.LOCATION_Y);
-	titlePanel.setSize(Constants.TITLE_Constant.WIDTH,
-			Constants.TITLE_Constant.HEIGHT);
-}
+//private void initTitlePanel() {
+//	Panel titlePanel = new TitlePanel(this, shell, SWT.NONE, recorder);
+//	titlePanel.setLocation(Constants.TITLE_Constant.LOCATION_X,
+//			Constants.TITLE_Constant.LOCATION_Y);
+//	titlePanel.setSize(Constants.TITLE_Constant.WIDTH,
+//			Constants.TITLE_Constant.HEIGHT);
+//}
 
 // 初始化脸部摄像头
 private void initVideoPlayBackPanel() {
@@ -302,19 +302,19 @@ private void initOtherVideoPlayBackPanel() {
 }
 
 // 初始化教师信息
-private void initInfoLaber() {
-	com.fywl.ILook.ui.components.panel.Label info = new InfoLaber(shell,
-			SWT.INHERIT_DEFAULT, null);
-	info.create();
-	info.setLocation(Constants.INFO_LABEL_Constant.LOCATION_X,
-			Constants.INFO_LABEL_Constant.LOCATION_Y);
-	info.setSize(Constants.INFO_LABEL_Constant.WIDTH,
-			Constants.INFO_LABEL_Constant.HEIGHT);
-	Image infoImage = new Image(info.getDisplay(), this.getClass()
-			.getResourceAsStream("/images/info.png"));
-	info.setBackgroundImage(infoImage);
-	info.setBackgroundMode(SWT.INHERIT_DEFAULT);
-}
+//private void initInfoLaber() {
+//	com.fywl.ILook.ui.components.panel.Label info = new InfoLaber(shell,
+//			SWT.INHERIT_DEFAULT, null);
+//	info.create();
+//	info.setLocation(Constants.INFO_LABEL_Constant.LOCATION_X,
+//			Constants.INFO_LABEL_Constant.LOCATION_Y);
+//	info.setSize(Constants.INFO_LABEL_Constant.WIDTH,
+//			Constants.INFO_LABEL_Constant.HEIGHT);
+//	Image infoImage = new Image(info.getDisplay(), this.getClass()
+//			.getResourceAsStream("/images/info.png"));
+//	info.setBackgroundImage(infoImage);
+//	info.setBackgroundMode(SWT.INHERIT_DEFAULT);
+//}
 
 // 初始化监听切换摄像头
 private void initChangeCam() {
@@ -329,13 +329,13 @@ private void initChangeCam() {
 }
 
 // 初始化底部工具条
-private void initToolPanel() {
-	toolPanel = new ToolPanel(this, shell, SWT.NONE, recorder);
-	toolPanel.setLocation(Constants.TOOL_Constant.LOCATION_X,
-			Constants.TOOL_Constant.LOCATION_Y);
-	toolPanel.setSize(Constants.TOOL_Constant.WIDTH,
-			Constants.TOOL_Constant.HEIGHT);
-}
+//private void initToolPanel() {
+//	toolPanel = new ToolPanel(this, shell, SWT.NONE, recorder);
+//	toolPanel.setLocation(Constants.TOOL_Constant.LOCATION_X,
+//			Constants.TOOL_Constant.LOCATION_Y);
+//	toolPanel.setSize(Constants.TOOL_Constant.WIDTH,
+//			Constants.TOOL_Constant.HEIGHT);
+//}
 
 
 }

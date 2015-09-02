@@ -10,7 +10,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.ImageButton;
-import com.fywl.ILook.ui.components.MyLabel;
+import com.fywl.ILook.ui.components.SetupPanel;
 import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.listener.MoveableListener;
@@ -56,7 +56,6 @@ public class TitlePanel extends Panel {
 			public void handleEvent(Event event) {
 				parent.getDisplay().getSystemTray().getItem(0).setVisible(false);
 				parent.setVisible(false);
-				recorder.stop();
 				closer.shutDown();
 				System.exit(0);
 			}
@@ -79,12 +78,22 @@ public class TitlePanel extends Panel {
 
 			}
 		});
-
-		new MyLabel(this, SWT.NONE,
-				Constants.TITLE_PANEL_Constant.TITLE_CONTENT,
-				Constants.TITLE_PANEL_Constant.TITLE_LOCATION)
-				.setForeground(SWTResourceManager
-						.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
+		
+		
+		ImageButton setupBtn = new ImageButton(this,
+				Constants.TITLE_PANEL_Constant.SETUP_URL, "设置");
+		setupBtn.getButton().setBounds(
+				Constants.TITLE_PANEL_Constant.SETUP_LOCATION[0],
+				Constants.TITLE_PANEL_Constant.SETUP_LOCATION[1],
+				Constants.TITLE_PANEL_Constant.SETUP_LOCATION[2],
+				Constants.TITLE_PANEL_Constant.SETUP_LOCATION[3]);
+		setupBtn.getButton().addListener(SWT.Selection, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				SetupPanel sp = new SetupPanel(parent.getShell(), SWT.NONE);
+				sp.moveAbove(null);
+			}
+		});
 	}
 
 }

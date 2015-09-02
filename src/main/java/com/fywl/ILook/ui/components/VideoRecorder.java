@@ -46,9 +46,9 @@ public class VideoRecorder implements ImageRecorder {
 
 	private Graphics g = null;
 
-	// public VideoRecorder() {
-	// reader = new MediaReader();
-	// }
+	 public VideoRecorder() {
+		 
+	 }
 
 	public VideoRecorder(ScreenPlayBackPanel screenPlayBackPanel,
 			VideoPlayBackPanel otherVideoPlayback) {
@@ -82,6 +82,7 @@ public class VideoRecorder implements ImageRecorder {
 
 	// 切换画面
 	private void changeHuaMian() {
+		System.out.println(recordVideo);
 		if (recordVideo) {
 			screenPlayBackPanel.setSize(Constants.NOTE_Constant.WIDTH,
 					Constants.NOTE_Constant.HEIGHT);
@@ -115,7 +116,7 @@ public class VideoRecorder implements ImageRecorder {
 	private void draw(BufferedImage screen) {
 		if (g != null && screen != null) {
 			if (recordVideo) {
-				g.drawImage(screen, 320, 90, 960, 540, null);
+				g.drawImage(screen, 320, 0, 960, 540, null);
 			} else {
 				g.drawImage(screen, 0, 240, 320, 240, null);
 			}
@@ -153,7 +154,9 @@ class MediaReader implements Runnable {
 	// 是否改变了切换按钮的状
 	private Boolean changeFlag = false;
 	
-	
+	VideoListener secVideo;
+
+	VideoListener secVideo1;
 	
 
 	public MediaReader() {
@@ -181,6 +184,8 @@ class MediaReader implements Runnable {
 	
 	//每次录制的完成
 	public void finish() {
+		Webcam.getWebcams().get(1).removeWebcamListener(secVideo);
+		Webcam.getWebcams().get(1).removeWebcamListener(secVideo1);
 		record = false;
 		pauseFlag = false;
 		g = null;
@@ -235,10 +240,10 @@ class MediaReader implements Runnable {
 			VideoListener faceVideo = new VideoListener(g, 0, 0, 320, 240);
 			Webcam.getWebcams().get(0).addWebcamListener(faceVideo);
 
-			VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
-//			Webcam.getWebcams().get(1).addWebcamListener(secVideo);
-
-			VideoListener secVideo1 = new VideoListener(g, 320, 90, 960, 540);
+//			VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
+////			Webcam.getWebcams().get(1).addWebcamListener(secVideo);
+//
+//			VideoListener secVideo1 = new VideoListener(g, 320, 90, 960, 540);
 			// Webcam.getWebcams().get(1).addWebcamListener(secVideo1);
 			line.start();
 
@@ -252,7 +257,6 @@ class MediaReader implements Runnable {
 					 break;
 					 }
 					 i++;
-					 System.out.println(i);
 					 if(i == 200){
 						 record = false;
 						 break;
@@ -260,12 +264,14 @@ class MediaReader implements Runnable {
 				}
 				System.out.println("······暂停中");
 				System.out.println("---"+i);
+				Thread.sleep(500);
 			}
 		} catch(Exception e){
 			e.printStackTrace();
 		}finally {
 			line.close();
 			writer.close();
+			System.out.println("关闭流");
 		}
 
 	}
@@ -328,6 +334,9 @@ class MediaReader implements Runnable {
 	
 	//初始化状态参数
 	private void initParam(){
+		secVideo = new VideoListener(g, 0, 240, 320, 240);
+
+		secVideo1 = new VideoListener(g, 320, 90, 960, 540);
 		//录制状态
 		record = true;
 		// 暂停状态
