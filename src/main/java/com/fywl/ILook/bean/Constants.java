@@ -10,6 +10,8 @@ public class Constants {
 		public String TRAY_URL = "images/record.png";
 		// 背景颜色
 		public int[] BACKGROUND = { 60, 131, 209 };
+		//网站主页
+		public String WEBSITE = "www.baidu.com";
 	}
 
 	// 脸部摄像头
@@ -125,7 +127,7 @@ public class Constants {
 		public int VERSION_COLOR = SWT.COLOR_WHITE;
 		// 网站信息
 		public int[] WEBSITE_LOCATION = { 250, 0, 250, 30 };
-		public String WEBSITE_CONTENT = "www.ilooke.cn";
+//		public String WEBSITE_CONTENT = "www.ilooke.cn";
 		public int WEBSITE_COLOR = SWT.COLOR_WHITE;
 	}
 
@@ -150,10 +152,18 @@ public class Constants {
 		// 登录请求url
 		public String HTTP_LOGIN_URL = "http://localhost:8080/test/login";
 	}
-	
-	
-	//上传时候的常量
-	public interface UPLOAD_Constant{
-		public String[] TYPE = {"数学","语文","英语","物理","化学"};
+
+	// 上传时候的常量
+	public interface UPLOAD_Constant {
+		public String[] TYPE = { "数学", "语文", "英语", "物理", "化学" };
+	}
+
+	// 设置部分常量
+	public interface SETUP_Constant {
+		public boolean openComputerAutoStartFlag = false;
+		public boolean openSoftwareAutoLoginFlag = false;
+		public boolean openWebsiteAfterLoginFlag = false;
+		public boolean showIconFlag = false;
+		public String videoPath = System.getProperty("user.dir");
 	}
 }

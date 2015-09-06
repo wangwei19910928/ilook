@@ -21,7 +21,7 @@ public class FootLabel extends Composite {
 		v.setForeground(SWTResourceManager
 				.getColor(Constants.FOOT_LABEL_Constant.VERSION_COLOR));
 		Label w = new MyLabel(this, SWT.NONE,
-				Constants.FOOT_LABEL_Constant.WEBSITE_CONTENT,
+				Constants.Shell_Constant.WEBSITE,
 				Constants.FOOT_LABEL_Constant.WEBSITE_LOCATION);
 		w.setAlignment(SWT.RIGHT);
 		w.setForeground(SWTResourceManager

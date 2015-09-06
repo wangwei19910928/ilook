@@ -3,7 +3,6 @@ package com.fywl.ILook.ui.mw.impl;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.Properties;
 
@@ -35,6 +34,7 @@ import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.DESCrypt;
 import com.fywl.ILook.utils.HttpRequest;
 import com.fywl.ILook.utils.ImageUtil;
+import com.fywl.ILook.utils.PropertyUtil;
 
 public class LoginMainWindow extends MainWindow implements Closer {
 
@@ -101,8 +101,7 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				if (null != username && username.length() > 0) {
 					text.setText(username);
 				}
-				String autoflag = properties.getProperty("autoflag");
-				System.out.println(autoflag);
+				String autoflag = properties.getProperty("openSoftwareAutoLoginFlag");
 				if (null != autoflag && "true".equals(autoflag)) {
 					button.setSelection(true);
 					// String password = properties.getProperty("password");
@@ -174,11 +173,7 @@ public class LoginMainWindow extends MainWindow implements Closer {
 	}
 
 	private void initMiddle() {
-		/*
-		 * 登录中部分初始化
-		 */
-		final ProgressBar pb = new ProgressBar(shell, SWT.INDETERMINATE);
-		pb.setBounds(200, 210, 100, 20);
+		
 		/*
 		 * 登录部分初始化
 		 */
@@ -243,6 +238,12 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				}
 			}
 		});
+		
+		/*
+		 * 登录中部分初始化
+		 */
+		final ProgressBar pb = new ProgressBar(shell, SWT.INDETERMINATE);
+		pb.setBounds(200, 210, 100, 20);
 
 		loginButton = new Button(cp, SWT.BORDER | SWT.FLAT);
 		loginButton.setFont(SWTResourceManager.getFont(
@@ -267,13 +268,13 @@ public class LoginMainWindow extends MainWindow implements Closer {
 					//保存用户信息到本地
 					Properties properties = new Properties();
 					properties.setProperty("username", text.getText());
-					properties.setProperty("autoflag", button.getSelection() + "");
+					properties.setProperty("openSoftwareAutoLoginFlag", button.getSelection() + "");
 					if(button.getSelection()){
 						DESCrypt des = new DESCrypt();// 实例化一个对像
 						String strEnc = des.getEncString(text_1.getText());// 加密字符串,返回String的密文
 						properties.setProperty("password", strEnc);
 					}
-					setValue(properties);
+					PropertyUtil.setValue(properties,sFile);
 					
 					tray.dispose();
 					shell.dispose();
@@ -282,6 +283,30 @@ public class LoginMainWindow extends MainWindow implements Closer {
 					ib.setSchool("北京市第三中学");
 					ib.setTrainAge(3);
 					ib.setType("体育");
+					
+					//打开网站
+					FileInputStream fis;
+					try {
+						fis = new FileInputStream(sFile);
+						properties.load(fis);
+						fis.close();
+					} catch (FileNotFoundException e1) {
+						// TODO Auto-generated catch block
+						e1.printStackTrace();
+					} catch (IOException e) {
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+					}
+					String openWebsiteAfterLoginFlag = properties.getProperty("openWebsiteAfterLoginFlag");
+					System.out.println(openWebsiteAfterLoginFlag);
+					if("true".equals(openWebsiteAfterLoginFlag)){
+						try {
+							Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://"+Constants.Shell_Constant.WEBSITE);
+						} catch (IOException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						}
+					}
 					new FunctionMainWindow(ib);
 				}else{
 //					cp1.setVisible(false);
@@ -325,24 +350,6 @@ public class LoginMainWindow extends MainWindow implements Closer {
 		}
 	}
 
-	/**
-	 * 设置本地存储
-	 * 
-	 * @param username
-	 * @param password
-	 */
-	private void setValue(Properties properties) {
-		try {
-			if (!sFile.exists()) {
-				sFile.createNewFile();
-			}
-			FileOutputStream fos = new FileOutputStream(sFile);
-			properties.store(fos, "fywl");
-			fos.close();
-		} catch (Exception e) {
-			e.printStackTrace();
-		}
-	}
 
 	public static void main(String[] args) {
 		new LoginMainWindow();

@@ -1,13 +1,10 @@
 package com.fywl.ILook.ui.components;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
-
-import javax.sound.midi.MidiDevice.Info;
-import javax.sound.midi.MidiSystem;
-import javax.sound.midi.MidiUnavailableException;
-import javax.sound.midi.Receiver;
-import javax.sound.midi.spi.MidiDeviceProvider;
-import javax.sound.sampled.Port;
+import java.util.Properties;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.widgets.Button;
@@ -21,6 +18,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
+import com.fywl.ILook.utils.PropertyUtil;
 
 public class SetupPanel extends Composite implements Closer {
 
@@ -36,6 +34,18 @@ public class SetupPanel extends Composite implements Closer {
 	}
 
 	private void init() {
+		File file = new File("user.properties");
+		FileInputStream fis;
+		Properties properties = new Properties();
+		try {
+			fis = new FileInputStream(file);
+			properties.load(fis);
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		this.setBounds(0, 0, Constants.Shell_Constant.WIDTH,
 				Constants.Shell_Constant.HEIGHT);
 
@@ -64,55 +74,71 @@ public class SetupPanel extends Composite implements Closer {
 		int locationDL[] = { 40, 60, 45, 20 };
 		new MyLabel(this, SWT.NONE, "登 录", locationDL);
 
-		Button kjqd = new Button(this, SWT.CHECK);
+		final Button kjqd = new Button(this, SWT.CHECK);
 		kjqd.setText("开机时自动启动");
 		kjqd.setBounds(150, 50, 300, 30);
+		String openComputerAutoStartFlag = properties.getProperty("openComputerAutoStartFlag");
+		if("true".equals(openComputerAutoStartFlag)){
+			kjqd.setSelection(true);
+		}
 
-		Button kjdl = new Button(this, SWT.CHECK);
+		final Button kjdl = new Button(this, SWT.CHECK);
 		kjdl.setText("开启爱录课后自动登录");
 		kjdl.setBounds(150, 90, 300, 30);
+		String openSoftwareAutoLoginFlag = properties.getProperty("openSoftwareAutoLoginFlag");
+		if("true".equals(openSoftwareAutoLoginFlag)){
+			kjdl.setSelection(true);
+		}
 
-		Button dl = new Button(this, SWT.CHECK);
+		final Button dl = new Button(this, SWT.CHECK);
 		dl.setText("登录后打开官方网站");
 		dl.setBounds(150, 130, 300, 30);
+		String openWebsiteAfterLoginFlag = properties.getProperty("openWebsiteAfterLoginFlag");
+		if("true".equals(openWebsiteAfterLoginFlag)){
+			dl.setSelection(true);
+		}
 
 		// 显示
 		int locationXS[] = { 40, 180, 45, 20 };
 		new MyLabel(this, SWT.NONE, "显 示", locationXS);
 
-		Button xxtb = new Button(this, SWT.CHECK);
+		final Button xxtb = new Button(this, SWT.CHECK);
 		xxtb.setText("在任务通知栏区域显示爱录课图标");
 		xxtb.setBounds(150, 170, 300, 30);
+		String showIconFlag = properties.getProperty("showIconFlag");
+		if("true".equals(showIconFlag)){
+			xxtb.setSelection(true);
+		}
 
 		// 声音
-		int locationSY[] = { 40, 220, 45, 20 };
-		new MyLabel(this, SWT.NONE, "声 音", locationSY);
-		
-		Label mkf1 = new Label(this, SWT.NONE);
-		mkf1.setText("    打开文件夹 ");
-		mkf1.setBounds(300, 220, 90, 20);
-		mkf1.setBackground(SWTResourceManager.getColor(244, 253, 209));
-		mkf1.addListener(SWT.MouseUp, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				Port.Info.LINE_IN.getName();
-				System.out.println(Port.Info.LINE_IN.toString());
-				Info[] info =  MidiSystem.getMidiDeviceInfo();
-				try {
-					Receiver r =  MidiSystem.getReceiver();
-					System.out.println(r.toString());
-				} catch (MidiUnavailableException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-				System.out.println(info.length);
-				System.out.println(info[0].getName());
-			}
-		});
-
-		Label mkf = new Label(this, SWT.CHECK);
-		mkf.setText("麦克风");
-		mkf.setBounds(150, 210, 300, 30);
+		// int locationSY[] = { 40, 220, 45, 20 };
+		// new MyLabel(this, SWT.NONE, "声 音", locationSY);
+		//
+		// Label mkf1 = new Label(this, SWT.NONE);
+		// mkf1.setText("    打开文件夹 ");
+		// mkf1.setBounds(300, 220, 90, 20);
+		// mkf1.setBackground(SWTResourceManager.getColor(244, 253, 209));
+		// mkf1.addListener(SWT.MouseUp, new Listener() {
+		// @Override
+		// public void handleEvent(Event event) {
+		// Port.Info.LINE_IN.getName();
+		// System.out.println(Port.Info.LINE_IN.toString());
+		// Info[] info = MidiSystem.getMidiDeviceInfo();
+		// try {
+		// Receiver r = MidiSystem.getReceiver();
+		// System.out.println(r.toString());
+		// } catch (MidiUnavailableException e) {
+		// // TODO Auto-generated catch block
+		// e.printStackTrace();
+		// }
+		// System.out.println(info.length);
+		// System.out.println(info[0].getName());
+		// }
+		// });
+		//
+		// Label mkf = new Label(this, SWT.CHECK);
+		// mkf.setText("麦克风");
+		// mkf.setBounds(150, 210, 300, 30);
 
 		// 存储
 		int locationCC[] = { 40, 260, 45, 20 };
@@ -124,7 +150,9 @@ public class SetupPanel extends Composite implements Closer {
 
 		final Text cunchu = new Text(this, SWT.BORDER);
 		cunchu.setBounds(190, 260, 200, 20);
-
+		String videoPath = properties.getProperty("videoPath");
+		cunchu.setText(videoPath);
+		
 		Label ggml = new Label(this, SWT.NONE);
 		ggml.setText("     更改目录 ");
 		ggml.setBounds(150, 290, 90, 20);
@@ -160,6 +188,51 @@ public class SetupPanel extends Composite implements Closer {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+			}
+		});
+
+		// 恢复默认
+		Label hfmr = new Label(this, SWT.NONE);
+		hfmr.setText("    恢复默认 ");
+		hfmr.setBounds(80, 330, 90, 20);
+		hfmr.setBackground(SWTResourceManager.getColor(Constants.Shell_Constant.BACKGROUND[0],
+				Constants.Shell_Constant.BACKGROUND[1],
+				Constants.Shell_Constant.BACKGROUND[2]));
+		hfmr.addListener(SWT.MouseUp, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				kjqd.setSelection(Constants.SETUP_Constant.openComputerAutoStartFlag);
+				kjdl.setSelection(Constants.SETUP_Constant.openSoftwareAutoLoginFlag);
+				dl.setSelection(Constants.SETUP_Constant.openWebsiteAfterLoginFlag);
+				xxtb.setSelection(Constants.SETUP_Constant.showIconFlag);
+				cunchu.setText(Constants.SETUP_Constant.videoPath);
+			}
+		});
+
+		// 保存更改
+		Label bcgg = new Label(this, SWT.NONE);
+		bcgg.setText("    保存更改 ");
+		bcgg.setBounds(300, 330, 90, 20);
+		bcgg.setBackground(SWTResourceManager.getColor(
+				Constants.Shell_Constant.BACKGROUND[0],
+				Constants.Shell_Constant.BACKGROUND[1],
+				Constants.Shell_Constant.BACKGROUND[2]));
+		bcgg.addListener(SWT.MouseUp, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				File file = new File("user.properties");
+				boolean openComputerAutoStartFlag = kjqd.getSelection();
+				boolean openSoftwareAutoLoginFlag = kjdl.getSelection();
+				boolean openWebsiteAfterLoginFlag = dl.getSelection();
+				boolean	showIconFlag = xxtb.getSelection();
+				String videoPath = cunchu.getText();
+				Properties properties = new Properties();
+				properties.setProperty("openComputerAutoStartFlag", openComputerAutoStartFlag+"");
+				properties.setProperty("openSoftwareAutoLoginFlag", openSoftwareAutoLoginFlag+"");
+				properties.setProperty("openWebsiteAfterLoginFlag", openWebsiteAfterLoginFlag+"");
+				properties.setProperty("showIconFlag", showIconFlag+"");
+				properties.setProperty("videoPath", videoPath);
+				PropertyUtil.setValue(properties, file);
 			}
 		});
 
