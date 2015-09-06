@@ -66,9 +66,15 @@
 			<version>0.3.10</version>
 		</dependency>
 
+		<!-- <dependency> -->
+		<!-- <groupId>xuggle</groupId> -->
+		<!-- <artifactId>xuggle-xuggler</artifactId> -->
+		<!-- <version>5.4</version> -->
+		<!-- </dependency> -->
+
 		<dependency>
-			<groupId>xuggle</groupId>
-			<artifactId>xuggle-xuggler</artifactId>
+			<groupId>com.xuggle</groupId>
+			<artifactId>xuggle</artifactId>
 			<version>5.4</version>
 		</dependency>
 
@@ -79,6 +85,12 @@
 		</dependency>
 
 
+
+		<dependency>
+			<groupId>com.ice.jni</groupId>
+			<artifactId>registry</artifactId>
+			<version>1.0</version>
+		</dependency>
 	</dependencies>
 
 
