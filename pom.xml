@@ -85,10 +85,15 @@
 		</dependency>
 
 
-
+		<!-- 来自本地私服 -->
 		<dependency>
 			<groupId>com.ice.jni</groupId>
 			<artifactId>registry</artifactId>
+			<version>1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>org.eclipse</groupId>
+			<artifactId>nebula</artifactId>
 			<version>1.0</version>
 		</dependency>
 	</dependencies>
