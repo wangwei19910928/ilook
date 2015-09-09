@@ -149,7 +149,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		titlePanel.setSize(Constants.TITLE_PANEL_Constant.LOCATION[2],
 				Constants.TITLE_PANEL_Constant.LOCATION[3]);
 
-		MoveableListener listener = new MoveableListener(titlePanel);
+		MoveableListener listener = new MoveableListener(titlePanel.getParent());
 		MyLabel title = new MyLabel(titlePanel, SWT.NONE,
 				Constants.TITLE_PANEL_Constant.TITLE_CONTENT,
 				Constants.TITLE_PANEL_Constant.TITLE_LOCATION);

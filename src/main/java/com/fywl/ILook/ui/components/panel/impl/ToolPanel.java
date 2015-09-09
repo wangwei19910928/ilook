@@ -34,12 +34,14 @@ public class ToolPanel extends Panel {
 		Label minuteLabel = new Label(this, SWT.NONE);
 		minuteLabel.setBounds(424, 5, 30, 30);
 		minuteLabel.setAlignment(SWT.RIGHT);
+		minuteLabel.setText("0");
 		Label minutesLabel = new Label(this, SWT.NONE);
 		minutesLabel.setBounds(454, 5, 11, 30);
 		minutesLabel.setText("分");
 		Label secondLabel = new Label(this, SWT.NONE);
 		secondLabel.setBounds(465, 5, 15, 30);
 		secondLabel.setAlignment(SWT.RIGHT);
+		secondLabel.setText("0");
 		Label secondsLabel = new Label(this, SWT.NONE);
 		secondsLabel.setBounds(480, 5, 20, 30);
 		secondsLabel.setText("秒");
@@ -101,21 +103,28 @@ public class ToolPanel extends Panel {
 		sBtn.addListener(SWT.MouseUp, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				System.out.println(222);
 				recording = false;
+				initBegin(beginBtn, beginImage);
+				recorder.finish();
 				if (recorder.getTime() > 0) {
-					final MessagePanel mp = new MessagePanel(parent.getShell(),
-							SWT.SYSTEM_MODAL);
+					//  遮罩层
+					final Composite zz = new Composite(beginBtn.getParent()
+							.getShell(), SWT.NO_BACKGROUND);
+					zz.setBounds(0, 0, 500, 440);
+					zz.moveAbove(null);
+					final MessagePanel mp = new MessagePanel(zz,
+							SWT.NONE);
+					mp.moveAbove(null);
 					mp.setBounds(100, 100, 350, 290);
 					int[] location = { 0, 0, 0, 0 };
 					Label label = new MyLabel(mp, SWT.NONE, "  上 传  ", location);
 					label.addListener(SWT.MouseUp, new Listener() {
 						@Override
 						public void handleEvent(Event event) {
-							mp.dispose();
 							UploadPanel up = new UploadPanel(parent.getShell(),
 									SWT.SYSTEM_MODAL, recorder.getVideoName());
 							up.moveAbove(null);
+							zz.dispose();
 						}
 					});
 					mp.setLabel(label);
@@ -123,10 +132,7 @@ public class ToolPanel extends Panel {
 					mp.init("/images/save.png", "微课已成功保存", "总时长" + time / 3600
 							+ ":" + time / 60 + ":" + time % 60,
 							"点击上传添加相应信息即可上传");
-					mp.moveAbove(null);
 				}
-				initBegin(beginBtn, beginImage);
-				recorder.finish();
 			}
 		});
 		
@@ -150,8 +156,13 @@ public class ToolPanel extends Panel {
 					initBegin(beginBtn, beginImage);
 					recording = false;
 					recorder.finish();
-					final MessagePanel mp = new MessagePanel(parent.getShell(),
-							SWT.SYSTEM_MODAL);
+				//  遮罩层
+					final Composite zz = new Composite(beginBtn.getParent()
+							.getShell(), SWT.NO_BACKGROUND);
+					zz.setBounds(0, 0, 500, 440);
+					zz.moveAbove(null);
+					final MessagePanel mp = new MessagePanel(zz,
+							SWT.NONE);
 					mp.setBounds(100, 100, 350, 290);
 					int[] location = { 0, 0, 0, 0 };
 					Label label = new MyLabel(mp, SWT.NONE, "  重 录  ", location);
@@ -162,7 +173,7 @@ public class ToolPanel extends Panel {
 							e.widget = beginBtn;
 							// 主动触发button点击事件
 							beginBtn.notifyListeners(SWT.MouseUp, e);
-							mp.dispose();
+							zz.dispose();
 						}
 					});
 					mp.setLabel(label);
@@ -170,7 +181,7 @@ public class ToolPanel extends Panel {
 					mp.init("/images/save.png", "执行此操作将放弃当前微课！", "总时长" + time
 							/ 3600 + ":" + time / 60 + ":" + time % 60,
 							"您可以选择重录或者回到主页面");
-					mp.moveAbove(null);
+					mp.moveAbove(zz);
 				}
 			}
 		});

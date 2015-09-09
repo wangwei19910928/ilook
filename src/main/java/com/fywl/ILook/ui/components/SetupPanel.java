@@ -18,6 +18,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
+import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.utils.PropertyUtil;
 import com.fywl.ILook.utils.RegeditTool;
 
@@ -52,7 +53,8 @@ public class SetupPanel extends Composite implements Closer {
 		
 		this.setBounds(0, 0, Constants.Shell_Constant.WIDTH,
 				Constants.Shell_Constant.HEIGHT);
-
+		
+		MoveableListener listener = new MoveableListener(this.getParent());
 		// 顶部标题
 		Composite title = new Composite(this, SWT.NONE);
 		title.setBackground(SWTResourceManager.getColor(
@@ -60,9 +62,14 @@ public class SetupPanel extends Composite implements Closer {
 				Constants.Shell_Constant.BACKGROUND[1],
 				Constants.Shell_Constant.BACKGROUND[2]));
 		title.setBounds(0, 0, Constants.Shell_Constant.WIDTH, 30);
+		title.addMouseListener(listener);
+		title.addMouseMoveListener(listener);
 		// 标题文字
 		int location[] = { 0, 5, 80, 30 };
-		new MyLabel(title, SWT.NONE, "设置", location);
+		MyLabel titleLabel =  new MyLabel(title, SWT.NONE, "设置", location);
+		titleLabel.addMouseListener(listener);
+		titleLabel.addMouseMoveListener(listener);
+		
 		// 关闭按钮
 		final ImageButton closeBtn = new ImageButton(title,
 				Constants.TITLE_PANEL_Constant.CLOSE_URL, "关闭");
@@ -229,6 +236,11 @@ public class SetupPanel extends Composite implements Closer {
 		bcgg.addListener(SWT.MouseUp, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
+				// 上传状态 遮罩层
+				final Composite mp = new Composite(cunchu.getParent()
+						.getShell(), SWT.NO_BACKGROUND);
+				mp.setBounds(0, 0, 500, 440);
+				mp.moveAbove(null);
 				File file = new File("user.properties");
 				boolean openComputerAutoStartFlag = kjqd.getSelection();
 				if(openComputerAutoStartFlag){
@@ -247,6 +259,8 @@ public class SetupPanel extends Composite implements Closer {
 				properties.setProperty("showIconFlag", showIconFlag+"");
 				properties.setProperty("videoPath", videoPath);
 				PropertyUtil.setValue(properties, file);
+				
+				new EmptyPanel(mp, SWT.NONE, "保存成功","  关 闭",null);
 			}
 		});
 

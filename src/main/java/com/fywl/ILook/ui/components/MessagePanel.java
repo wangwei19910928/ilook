@@ -21,7 +21,7 @@ public class MessagePanel extends Composite implements Closer {
 
 	@Override
 	public void shutDown() {
-		this.dispose();
+		this.getParent().dispose();
 	}
 
 	public void init(String iconUrl, String firstText, String secondText,
@@ -43,7 +43,7 @@ public class MessagePanel extends Composite implements Closer {
 		closeBtn.getButton().addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				closeBtn.parent.getParent().dispose();
+				closeBtn.parent.getParent().getParent().dispose();
 			}
 		});
 

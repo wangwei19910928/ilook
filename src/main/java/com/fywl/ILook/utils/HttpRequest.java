@@ -222,79 +222,77 @@ public class HttpRequest {
 		return strResponse;
 	}
 
-//	public static void upload(String serverUrl) {
-//		try {
-//			URL url = new URL("serverUrl"); // 文件接收的CGI,不一定是JSP的
-//
-//			HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-//			conn.setRequestMethod("POST");
-//			conn.setDoOutput(true);
-//
-//			String BOUNDARY = "---------------------------7d4a6d158c9"; // 分隔符
-//
-//			StringBuffer sb = new StringBuffer();
-//			sb.append("--");
-//			sb.append(BOUNDARY);
-//			sb.append("\r\n");
-//			sb.append("Content-Disposition: form-data; name=\"myfile\"; filename=\"test.txt\"\r\n");
-//			sb.append("Content-Type: application/octet-stream\r\n\r\n");
-//
-//			byte[] data = sb.toString().getBytes();
-//			byte[] end_data = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
-//
-//			conn.setRequestProperty("Content-Type",
-//					"multipart/form-data; boundary=" + BOUNDARY); // 设置表单类型和分隔符
-//			conn.setRequestProperty("Content-Length",
-//					String.valueOf(data.length + buf.length + end_data.length)); // 设置内容长度
-//
-//			os = conn.getOutputStream();
-//			os.write(data);
-//
-//			FileInputStream fis = new FileInputStream(new File(
-//					"E:/badboy/test.txt")); // 要上传的文件
-//
-//			int rn2;
-//			byte[] buf2 = new byte[1024];
-//			while ((rn2 = fis.read(buf2, 0, 1024)) > 0) {
-//				os.write(buf2, 0, rn2);
-//
-//			}
-//
-//			os.write(end_data);
-//			os.flush();
-//			os.close();
-//			fis.close();
-//
-//			// 得到返回的信息
-//			InputStream is = conn.getInputStream();
-//
-//			byte[] inbuf = new byte[1024];
-//			int rn;
-//			while ((rn = is.read(inbuf, 0, 1024)) > 0) {
-//
-//				System.out.write(inbuf, 0, rn);
-//
-//			}
-//			is.close();
-//
-//		} catch (Exception ee) {
-//			System.out.println("上传出错.");
-//		}
-//
-//	}
-	
-	
-	
-	
+	// public static void upload(String serverUrl) {
+	// try {
+	// URL url = new URL("serverUrl"); // 文件接收的CGI,不一定是JSP的
+	//
+	// HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+	// conn.setRequestMethod("POST");
+	// conn.setDoOutput(true);
+	//
+	// String BOUNDARY = "---------------------------7d4a6d158c9"; // 分隔符
+	//
+	// StringBuffer sb = new StringBuffer();
+	// sb.append("--");
+	// sb.append(BOUNDARY);
+	// sb.append("\r\n");
+	// sb.append("Content-Disposition: form-data; name=\"myfile\"; filename=\"test.txt\"\r\n");
+	// sb.append("Content-Type: application/octet-stream\r\n\r\n");
+	//
+	// byte[] data = sb.toString().getBytes();
+	// byte[] end_data = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
+	//
+	// conn.setRequestProperty("Content-Type",
+	// "multipart/form-data; boundary=" + BOUNDARY); // 设置表单类型和分隔符
+	// conn.setRequestProperty("Content-Length",
+	// String.valueOf(data.length + buf.length + end_data.length)); // 设置内容长度
+	//
+	// os = conn.getOutputStream();
+	// os.write(data);
+	//
+	// FileInputStream fis = new FileInputStream(new File(
+	// "E:/badboy/test.txt")); // 要上传的文件
+	//
+	// int rn2;
+	// byte[] buf2 = new byte[1024];
+	// while ((rn2 = fis.read(buf2, 0, 1024)) > 0) {
+	// os.write(buf2, 0, rn2);
+	//
+	// }
+	//
+	// os.write(end_data);
+	// os.flush();
+	// os.close();
+	// fis.close();
+	//
+	// // 得到返回的信息
+	// InputStream is = conn.getInputStream();
+	//
+	// byte[] inbuf = new byte[1024];
+	// int rn;
+	// while ((rn = is.read(inbuf, 0, 1024)) > 0) {
+	//
+	// System.out.write(inbuf, 0, rn);
+	//
+	// }
+	// is.close();
+	//
+	// } catch (Exception ee) {
+	// System.out.println("上传出错.");
+	// }
+	//
+	// }
+
 	/* 上传文件至Server的方法 */
-	public static String uploadFile(String actionUrl,String uploadFile) {
+	public static String uploadFile(String actionUrl, String uploadFile) {
 		String end = "\r\n";
 		String twoHyphens = "--";
 		String boundary = "*****";
 		String newName = "123.mp4";
-//		String uploadFile = "storage/sdcard1/bagPictures/102.jpg";
+		// String uploadFile = "storage/sdcard1/bagPictures/102.jpg";
 		;
-//		String actionUrl = "http://192.168.1.123:8080/upload/servlet/UploadServlet";
+		// String actionUrl =
+		// "http://192.168.1.123:8080/upload/servlet/UploadServlet";
 		try {
 			URL url = new URL(actionUrl);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
@@ -332,17 +330,30 @@ public class HttpRequest {
 			fStream.close();
 			ds.flush();
 			/* 取得Response内容 */
+//			String strLine = "";
+//			String strResponse = "";
+//
+//			InputStream in = con.getInputStream();
+//			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+//			while ((strLine = reader.readLine()) != null) {
+//				strResponse += strLine + "\n";
+//			}
 			InputStream is = con.getInputStream();
 			int ch;
-			StringBuffer b = new StringBuffer();
-			while ((ch = is.read()) != -1) {
-				b.append((char) ch);
+			byte[] b = new byte[1024];
+			// while ((ch = is.read()) != -1) {
+			// b.append((char) ch);
+			// }
+			while ((ch = is.read(b, 0, 1024)) > 0) {
+				System.out.println(111);
+				System.out.write(b, 0, ch);
+
 			}
 			/* 将Response显示于Dialog */
-			System.out.println("上传成功" + b.toString().trim());
+			System.out.println("上传成功" + new String(b));
 			/* 关闭DataOutputStream */
 			ds.close();
-			return b.toString().trim();
+			return  new String(b);
 		} catch (Exception e) {
 			System.out.println("上传失败" + e);
 			return "error";
