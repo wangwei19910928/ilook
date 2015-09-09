@@ -97,7 +97,7 @@ public class Constants {
 	// 底部工具条_常量信息
 	public interface TOOL_PANEL_Constant {
 		// PANEL位置信息
-		public int[] LOCATION = { 0, 390, 300, 30 };
+		public int[] LOCATION = { 0, 390, 500, 30 };
 		// 开始录制的信息
 		public int[] CAMERA_LOCATION = { 5, 0, 30, 30 };
 		public String CAMERA_URL = "/images/camera.png";
@@ -150,12 +150,14 @@ public class Constants {
 		// 登录按钮位置
 		public int[] LOGIN_LOCATION = { 192, 170, 200, 40 };
 		// 登录请求url
-		public String HTTP_LOGIN_URL = "http://localhost:8080/test/login";
+		public String HTTP_LOGIN_URL = "http://localhost:8080/web/login";
 	}
 
 	// 上传时候的常量
 	public interface UPLOAD_Constant {
 		public String[] TYPE = { "数学", "语文", "英语", "物理", "化学" };
+		public String[] KEY = { "1", "2", "3", "4", "5" };
+		public String HTTP_UPLOAD_URL = "http://127.0.0.1:8080/web/upload";
 	}
 
 	// 设置部分常量

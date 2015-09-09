@@ -19,6 +19,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.utils.PropertyUtil;
+import com.fywl.ILook.utils.RegeditTool;
 
 public class SetupPanel extends Composite implements Closer {
 
@@ -38,6 +39,9 @@ public class SetupPanel extends Composite implements Closer {
 		FileInputStream fis;
 		Properties properties = new Properties();
 		try {
+			if (!file.exists()) {
+				file.createNewFile();
+			}
 			fis = new FileInputStream(file);
 			properties.load(fis);
 		} catch (FileNotFoundException e1) {
@@ -150,8 +154,13 @@ public class SetupPanel extends Composite implements Closer {
 
 		final Text cunchu = new Text(this, SWT.BORDER);
 		cunchu.setBounds(190, 260, 200, 20);
+		cunchu.setEditable(false);
 		String videoPath = properties.getProperty("videoPath");
-		cunchu.setText(videoPath);
+		if(null != videoPath && !"".equals(videoPath)){
+			cunchu.setText(videoPath);
+		}else{
+			cunchu.setText(Constants.SETUP_Constant.videoPath);
+		}
 		
 		Label ggml = new Label(this, SWT.NONE);
 		ggml.setText("     更改目录 ");
@@ -222,6 +231,11 @@ public class SetupPanel extends Composite implements Closer {
 			public void handleEvent(Event event) {
 				File file = new File("user.properties");
 				boolean openComputerAutoStartFlag = kjqd.getSelection();
+				if(openComputerAutoStartFlag){
+					RegeditTool.setValue("SOFTWARE", "Microsoft\\Windows\\CurrentVersion\\Run", "ilook", "D:\\qq\txupd.exe");
+				}else{
+					RegeditTool.deleteValue("SOFTWARE", "Microsoft\\Windows\\CurrentVersion\\Run", "ilook");
+				}
 				boolean openSoftwareAutoLoginFlag = kjdl.getSelection();
 				boolean openWebsiteAfterLoginFlag = dl.getSelection();
 				boolean	showIconFlag = xxtb.getSelection();

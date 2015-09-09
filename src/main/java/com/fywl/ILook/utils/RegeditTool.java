@@ -23,6 +23,7 @@ public class RegeditTool {
             RegistryKey software = Registry.HKEY_LOCAL_MACHINE  
                     .openSubKey(folder);  
             RegistryKey subKey = software.createSubKey(subKeyNode, "");  
+            
             subKey  
                     .setValue(new RegStringValue(subKey, subKeyName,  
                             subKeyValue));  
@@ -99,7 +100,8 @@ public class RegeditTool {
   
     // 测试  
     public static void main(String[] args) {  
-        setValue("SOFTWARE", "Microsoft\\Windows\\CurrentVersion\\Run", "test",  
-                "C:\\1.exe");  
+//        setValue("SOFTWARE", "Microsoft\\Windows\\CurrentVersion\\Run", "KAISHI",  
+//                "D:\\youkuclient_setup_5.3.1.3050.exe");  
+        deleteValue("SOFTWARE", "Microsoft\\Windows\\CurrentVersion\\Run", "KAISHI");
     }  
 }

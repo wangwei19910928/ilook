@@ -3,11 +3,11 @@ package com.fywl.ILook.ui.components;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import java.awt.image.ColorModel;
-import java.awt.image.WritableRaster;
 import java.io.File;
-import java.util.Timer;
-import java.util.TimerTask;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
@@ -16,9 +16,6 @@ import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
 import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
-
-import org.eclipse.swt.widgets.Display;
-import org.eclipse.swt.widgets.ProgressBar;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.ui.listener.VideoListener;
@@ -46,9 +43,9 @@ public class VideoRecorder implements ImageRecorder {
 
 	private Graphics g = null;
 
-	 public VideoRecorder() {
-		 
-	 }
+	public VideoRecorder() {
+
+	}
 
 	public VideoRecorder(ScreenPlayBackPanel screenPlayBackPanel,
 			VideoPlayBackPanel otherVideoPlayback) {
@@ -116,22 +113,24 @@ public class VideoRecorder implements ImageRecorder {
 	private void draw(BufferedImage screen) {
 		if (g != null && screen != null) {
 			if (recordVideo) {
-				g.drawImage(screen, 320, 0, 960, 540, null);
+				g.drawImage(screen, 320, 90, 960, 540, null);
 			} else {
 				g.drawImage(screen, 0, 240, 320, 240, null);
 			}
 		}
 	}
-	
-	
-	public int getTime(){
+
+	public int getTime() {
 		return reader.getTime();
 	}
-	
+
 	public boolean getPauseFlag() {
 		return reader.getPauseFlag();
 	}
 
+	public String getVideoName() {
+		return reader.videoName;
+	}
 }
 
 class MediaReader implements Runnable {
@@ -142,7 +141,7 @@ class MediaReader implements Runnable {
 	private BufferedImage combined = null;
 
 	private Graphics g = null;
-	
+
 	private int i = 0;
 
 	private boolean record = true;
@@ -153,36 +152,52 @@ class MediaReader implements Runnable {
 	private Integer changeCount = 1;
 	// 是否改变了切换按钮的状
 	private Boolean changeFlag = false;
-	
+
 	VideoListener secVideo;
 
 	VideoListener secVideo1;
-	
+
+	Properties properties;
+
+	String videoName;
 
 	public MediaReader() {
 		combined = new BufferedImage((int) videoSize.getWidth(),
 				(int) videoSize.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
+
+		File file = new File("user.properties");
+		FileInputStream fis;
+		try {
+			if (file.exists()) {
+				properties = new Properties();
+				fis = new FileInputStream(file);
+				properties.load(fis);
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
 	}
-	
-	
-	//开始录制 可以多次开始录制，故要初始化所有的参数
+
+	// 开始录制 可以多次开始录制，故要初始化所有的参数
 	public Graphics start() {
 		g = combined.getGraphics();
 		executor.submit(this);
-		
+
 		initParam();
-		
+
 		return g;
 	}
-	
-	//完成录制 关掉所有资源
+
+	// 完成录制 关掉所有资源
 	public void stop() {
 		record = false;
 		g = null;
 		combined = null;
 	}
-	
-	//每次录制的完成
+
+	// 每次录制的完成
 	public void finish() {
 		Webcam.getWebcams().get(1).removeWebcamListener(secVideo);
 		Webcam.getWebcams().get(1).removeWebcamListener(secVideo1);
@@ -202,20 +217,22 @@ class MediaReader implements Runnable {
 		return format;
 	}
 
-	private BufferedImage deepCopy(BufferedImage bi) {
-		ColorModel cm = bi.getColorModel();
-		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-		WritableRaster raster = bi.copyData(null);
-		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-	}
+//	private BufferedImage deepCopy(BufferedImage bi) {
+//		ColorModel cm = bi.getColorModel();
+//		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+//		WritableRaster raster = bi.copyData(null);
+//		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+//	}
 
 	@Override
 	public void run() {
-
-		IMediaWriter writer = ToolFactory.makeWriter(System
-				.getProperty("user.dir")
-				+ File.separator
-				+ System.currentTimeMillis() + "test.mp4");
+		String videoSavePath = Constants.SETUP_Constant.videoPath;
+		if (null != properties) {
+			videoSavePath = properties.getProperty("videoPath");
+		}
+		videoName = videoSavePath + File.separator + System.currentTimeMillis()
+				+ "test.mp4";
+		IMediaWriter writer = ToolFactory.makeWriter(videoName);
 
 		writer.addVideoStream(0, 0, ICodec.ID.CODEC_ID_H264,
 				(int) videoSize.getWidth(), (int) videoSize.getHeight());
@@ -240,35 +257,35 @@ class MediaReader implements Runnable {
 			VideoListener faceVideo = new VideoListener(g, 0, 0, 320, 240);
 			Webcam.getWebcams().get(0).addWebcamListener(faceVideo);
 
-//			VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
-////			Webcam.getWebcams().get(1).addWebcamListener(secVideo);
-//
-//			VideoListener secVideo1 = new VideoListener(g, 320, 90, 960, 540);
+			// VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
+			// // Webcam.getWebcams().get(1).addWebcamListener(secVideo);
+			//
+			// VideoListener secVideo1 = new VideoListener(g, 320, 90, 960,
+			// 540);
 			// Webcam.getWebcams().get(1).addWebcamListener(secVideo1);
 			line.start();
 
-
 			while (record) {
 				while (pauseFlag) {
-					createVideo(writer, audioBuf, format,  secVideo,
-							secVideo1, line);
-					//录制中直接结束 跳出循环
-					 if(!record){
-					 break;
-					 }
-					 i++;
-					 if(i == 200){
-						 record = false;
-						 break;
-					 }
+					createVideo(writer, audioBuf, format, secVideo, secVideo1,
+							line);
+					// 录制中直接结束 跳出循环
+					if (!record) {
+						break;
+					}
+					i++;
+					// if(i == 200){
+					// record = false;
+					// break;
+					// }
 				}
 				System.out.println("······暂停中");
-				System.out.println("---"+i);
+				System.out.println("---" + i);
 				Thread.sleep(500);
 			}
-		} catch(Exception e){
+		} catch (Exception e) {
 			e.printStackTrace();
-		}finally {
+		} finally {
 			line.close();
 			writer.close();
 			System.out.println("关闭流");
@@ -299,6 +316,20 @@ class MediaReader implements Runnable {
 
 		writer.encodeVideo(0, frame);
 		writer.encodeAudio(1, smp);
+		
+//		new Thread(new Runnable() {
+//			public void run() {
+//				System.out.println("进入run");
+//				Display.getDefault().asyncExec(new Runnable() {
+//					@Override
+//					public void run() {
+//						System.out.println("终于执行了");
+//						infoLabel.setText("系统将在:" + i + "秒后自动重启");
+//					}
+//				});
+//			}
+//		}).start();
+//		infoLabel.getParent().layout();
 	}
 
 	void changePause() {
@@ -319,38 +350,34 @@ class MediaReader implements Runnable {
 	private void changeVideo(VideoListener secVideo, VideoListener secVideo1) {
 		if (changeFlag) {
 			if (changeCount % 2 == 0) {
-				Webcam.getWebcams().get(1)
-						.removeWebcamListener(secVideo);
-				Webcam.getWebcams().get(1)
-						.addWebcamListener(secVideo1);
+				Webcam.getWebcams().get(1).removeWebcamListener(secVideo);
+				Webcam.getWebcams().get(1).addWebcamListener(secVideo1);
 			} else {
-				Webcam.getWebcams().get(1)
-						.removeWebcamListener(secVideo1);
+				Webcam.getWebcams().get(1).removeWebcamListener(secVideo1);
 				Webcam.getWebcams().get(1).addWebcamListener(secVideo);
 			}
 			changeFlag = false;
 		}
 	}
-	
-	//初始化状态参数
-	private void initParam(){
+
+	// 初始化状态参数
+	private void initParam() {
 		secVideo = new VideoListener(g, 0, 240, 320, 240);
 
 		secVideo1 = new VideoListener(g, 320, 90, 960, 540);
-		//录制状态
+		// 录制状态
 		record = true;
 		// 暂停状态
 		pauseFlag = true;
-		//初始化时间
+		// 初始化时间
 		i = 0;
-//		// 切换按钮的次数
-//		changeCount = 1;
-//		// 切换按钮的状态
+		// // 切换按钮的次数
+		// changeCount = 1;
+		// // 切换按钮的状态
 		changeFlag = true;
 	}
-	
-	
-	int getTime(){
+
+	int getTime() {
 		return i;
 	}
 }

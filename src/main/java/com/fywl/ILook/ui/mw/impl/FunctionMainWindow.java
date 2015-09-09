@@ -24,13 +24,14 @@ import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.components.panel.impl.TitlePanel;
 import com.fywl.ILook.ui.components.panel.impl.ToolPanel;
+import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.ImageUtil;
 
 public class FunctionMainWindow extends MainWindow implements Closer {
-	
+
 	protected RecordConfig config;
-	
+
 	private ScreenPlayBackPanel screenPlayBackPanel;
 
 	private VideoPlayBackPanel faceVideoPlayback;
@@ -38,20 +39,20 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 	private VideoPlayBackPanel otherVideoPlayback;
 
 	private VideoRecorder recorder;
-	
+
 	private InfoBean ib;
 
 	// 出事最小化到系统托盘的监听
 	private Tray tray;
-	
-	public FunctionMainWindow(){
+
+	public FunctionMainWindow() {
 		super();
 	}
-	
-	public FunctionMainWindow(InfoBean ib){
+
+	public FunctionMainWindow(InfoBean ib) {
 		this();
 		this.ib = ib;
-		
+
 		init();
 	}
 
@@ -63,7 +64,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		faceVideoPlayback = new VideoPlayBackPanel(shell, config, 0);
 
 		otherVideoPlayback = new VideoPlayBackPanel(shell, config, 1);
-		
+
 		recorder = new VideoRecorder(screenPlayBackPanel, otherVideoPlayback);
 
 		tray = display.getSystemTray();
@@ -116,7 +117,8 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 	private void initSmallFunction() {
 		// 构造系统栏控件
 		TrayItem trayItem = new TrayItem(tray, SWT.NONE);
-		trayItem.setImage(ImageUtil.getInstance().getImage(Constants.Shell_Constant.TRAY_URL));
+		trayItem.setImage(ImageUtil.getInstance().getImage(
+				Constants.Shell_Constant.TRAY_URL));
 		trayItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				toggleDisplay();
@@ -146,12 +148,15 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 				Constants.TITLE_PANEL_Constant.LOCATION[1]);
 		titlePanel.setSize(Constants.TITLE_PANEL_Constant.LOCATION[2],
 				Constants.TITLE_PANEL_Constant.LOCATION[3]);
-		
-		new MyLabel(titlePanel, SWT.NONE,
+
+		MoveableListener listener = new MoveableListener(titlePanel);
+		MyLabel title = new MyLabel(titlePanel, SWT.NONE,
 				Constants.TITLE_PANEL_Constant.TITLE_CONTENT,
-				Constants.TITLE_PANEL_Constant.TITLE_LOCATION)
-				.setForeground(SWTResourceManager
-						.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
+				Constants.TITLE_PANEL_Constant.TITLE_LOCATION);
+		title.setForeground(SWTResourceManager
+				.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
+		title.addMouseListener(listener);
+		title.addMouseMoveListener(listener);
 	}
 
 	// 初始化脸部摄像头
@@ -196,20 +201,26 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 						Constants.INFO_LABEL_Constant.BACKGROUND_URL));
 		info.setBackgroundImage(infoImage);
 		info.setBackgroundMode(SWT.INHERIT_DEFAULT);
-		
+
 		Label icon = new Label(info, SWT.NONE);
 		icon.setBounds(Constants.INFO_LABEL_Constant.ICON_LOCATION[0],
 				Constants.INFO_LABEL_Constant.ICON_LOCATION[1],
 				Constants.INFO_LABEL_Constant.ICON_LOCATION[2],
 				Constants.INFO_LABEL_Constant.ICON_LOCATION[3]);
-		icon.setImage(ImageUtil.getInstance().getImage(info.getDisplay(),info.getClass().getResourceAsStream(
-				Constants.INFO_LABEL_Constant.ICON_URL)));
-		
-		new MyLabel(info, SWT.NONE, ib.getSchool(),Constants.INFO_LABEL_Constant.SCHOOL);
-		new MyLabel(info, SWT.NONE, ib.getName(),Constants.INFO_LABEL_Constant.NAME);
-		new MyLabel(info, SWT.NONE, ib.getType(),Constants.INFO_LABEL_Constant.TYPE);
-		new MyLabel(info, SWT.NONE, "教龄： "+ib.getTrainAge()+"年",Constants.INFO_LABEL_Constant.AGE);
-		
+		icon.setImage(ImageUtil.getInstance().getImage(
+				info.getDisplay(),
+				info.getClass().getResourceAsStream(
+						Constants.INFO_LABEL_Constant.ICON_URL)));
+
+		new MyLabel(info, SWT.NONE, ib.getSchool(),
+				Constants.INFO_LABEL_Constant.SCHOOL);
+		new MyLabel(info, SWT.NONE, ib.getName(),
+				Constants.INFO_LABEL_Constant.NAME);
+		new MyLabel(info, SWT.NONE, ib.getType(),
+				Constants.INFO_LABEL_Constant.TYPE);
+		new MyLabel(info, SWT.NONE, "教龄： " + ib.getTrainAge() + "年",
+				Constants.INFO_LABEL_Constant.AGE);
+
 	}
 
 	// 初始化监听切换摄像头
@@ -231,7 +242,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 				Constants.TOOL_PANEL_Constant.LOCATION[1]);
 		toolPanel.setSize(Constants.TOOL_PANEL_Constant.LOCATION[2],
 				Constants.TOOL_PANEL_Constant.LOCATION[3]);
-		
+
 		toolPanel.setBackgroundMode(SWT.INHERIT_DEFAULT);
 	}
 

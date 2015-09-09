@@ -15,7 +15,6 @@ import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
@@ -42,23 +41,23 @@ public class LoginMainWindow extends MainWindow implements Closer {
 	private Tray tray;
 
 	private File sFile;
-	
+
 	private Text text;
 
 	private Text text_1;
-	
+
 	private Button button;
-	
+
 	private Button loginButton;
-	
+
 	private Label messageLabel;
-	
-	public LoginMainWindow(){
+
+	public LoginMainWindow() {
 		super();
-		
+
 		init();
 	}
-	
+
 	@Override
 	protected void beforeInit() {
 		tray = display.getSystemTray();
@@ -101,7 +100,8 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				if (null != username && username.length() > 0) {
 					text.setText(username);
 				}
-				String autoflag = properties.getProperty("openSoftwareAutoLoginFlag");
+				String autoflag = properties
+						.getProperty("openSoftwareAutoLoginFlag");
 				if (null != autoflag && "true".equals(autoflag)) {
 					button.setSelection(true);
 					// String password = properties.getProperty("password");
@@ -173,7 +173,12 @@ public class LoginMainWindow extends MainWindow implements Closer {
 	}
 
 	private void initMiddle() {
-		
+		/*
+		 * 登录中部分初始化
+		 */
+		// final ProgressBar pb = new ProgressBar(shell, SWT.INDETERMINATE);
+		// pb.setBounds(200, 210, 100, 20);
+		// pb.setVisible(false);
 		/*
 		 * 登录部分初始化
 		 */
@@ -190,13 +195,17 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				display,
 				this.getClass().getResourceAsStream(
 						Constants.INFO_LABEL_Constant.ICON_URL)));
-		
+
 		messageLabel = new Label(cp, SWT.NONE);
-		messageLabel.setBounds(Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[0], Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[1], Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[2], Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[3]);
+		messageLabel.setBounds(
+				Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[0],
+				Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[1],
+				Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[2],
+				Constants.LOGIN_HEAD_Constant.MESSAGE_LOCATION[3]);
 		messageLabel.setText("用户名或密码错误");
 		messageLabel.setForeground(SWTResourceManager.getColor(SWT.COLOR_RED));
 		messageLabel.setVisible(false);
-		
+
 		text = new Text(cp, SWT.BORDER | SWT.SINGLE);
 		text.setBounds(Constants.LOGIN_HEAD_Constant.USERNAME_LOCATION[0],
 				Constants.LOGIN_HEAD_Constant.USERNAME_LOCATION[1],
@@ -231,19 +240,14 @@ public class LoginMainWindow extends MainWindow implements Closer {
 			@Override
 			public void handleEvent(Event event) {
 				try {
-					Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://www.baidu.com");
+					Runtime.getRuntime()
+							.exec("rundll32 url.dll,FileProtocolHandler http://www.baidu.com");
 				} catch (IOException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 		});
-		
-		/*
-		 * 登录中部分初始化
-		 */
-		final ProgressBar pb = new ProgressBar(shell, SWT.INDETERMINATE);
-		pb.setBounds(200, 210, 100, 20);
 
 		loginButton = new Button(cp, SWT.BORDER | SWT.FLAT);
 		loginButton.setFont(SWTResourceManager.getFont(
@@ -257,25 +261,28 @@ public class LoginMainWindow extends MainWindow implements Closer {
 		loginButton.addListener(SWT.MouseUp, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				//登录中····
+				// 登录中····
+				// pb.setVisible(true);
+				// pb.moveAbove(null);
 				cp.setVisible(false);
-				pb.moveAbove(null);
-				//登录
-				String str = HttpRequest.sendGet(Constants.LOGIN_HEAD_Constant.HTTP_LOGIN_URL, "username="+text.getText()+"&password="+text_1.getText());
-				
-				//成功
-				if(str.equals("1")){
-					//保存用户信息到本地
+				// 登录
+				String str = HttpRequest.sendGet(
+						Constants.LOGIN_HEAD_Constant.HTTP_LOGIN_URL,
+						"username=" + text.getText() + "&password="
+								+ text_1.getText());
+
+				// 成功
+				if (str.equals("1")) {
+					// 保存用户信息到本地
 					Properties properties = new Properties();
 					properties.setProperty("username", text.getText());
-					properties.setProperty("openSoftwareAutoLoginFlag", button.getSelection() + "");
-					if(button.getSelection()){
-						DESCrypt des = new DESCrypt();// 实例化一个对像
-						String strEnc = des.getEncString(text_1.getText());// 加密字符串,返回String的密文
-						properties.setProperty("password", strEnc);
-					}
-					PropertyUtil.setValue(properties,sFile);
-					
+					properties.setProperty("openSoftwareAutoLoginFlag",
+							button.getSelection() + "");
+					DESCrypt des = new DESCrypt();// 实例化一个对像
+					String strEnc = des.getEncString(text_1.getText());// 加密字符串,返回String的密文
+					properties.setProperty("password", strEnc);
+					PropertyUtil.setValue(properties, sFile);
+
 					tray.dispose();
 					shell.dispose();
 					InfoBean ib = new InfoBean();
@@ -283,8 +290,8 @@ public class LoginMainWindow extends MainWindow implements Closer {
 					ib.setSchool("北京市第三中学");
 					ib.setTrainAge(3);
 					ib.setType("体育");
-					
-					//打开网站
+
+					// 打开网站
 					FileInputStream fis;
 					try {
 						fis = new FileInputStream(sFile);
@@ -297,21 +304,23 @@ public class LoginMainWindow extends MainWindow implements Closer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					String openWebsiteAfterLoginFlag = properties.getProperty("openWebsiteAfterLoginFlag");
-					System.out.println(openWebsiteAfterLoginFlag);
-					if("true".equals(openWebsiteAfterLoginFlag)){
+					String openWebsiteAfterLoginFlag = properties
+							.getProperty("openWebsiteAfterLoginFlag");
+					if ("true".equals(openWebsiteAfterLoginFlag)) {
 						try {
-							Runtime.getRuntime().exec("rundll32 url.dll,FileProtocolHandler http://"+Constants.Shell_Constant.WEBSITE);
+							Runtime.getRuntime().exec(
+									"rundll32 url.dll,FileProtocolHandler http://"
+											+ Constants.Shell_Constant.WEBSITE);
 						} catch (IOException e) {
 							// TODO Auto-generated catch block
 							e.printStackTrace();
 						}
 					}
 					new FunctionMainWindow(ib);
-				}else{
-//					cp1.setVisible(false);
+				} else {
+					// cp1.setVisible(false);
 					messageLabel.setVisible(true);
-					pb.moveBelow(null);
+					// pb.moveBelow(null);
 					cp.setVisible(true);
 				}
 			}
@@ -327,7 +336,8 @@ public class LoginMainWindow extends MainWindow implements Closer {
 	private void initSmallFunction() {
 		// 构造系统栏控件
 		TrayItem trayItem = new TrayItem(tray, SWT.NONE);
-		trayItem.setImage(ImageUtil.getInstance().getImage(Constants.Shell_Constant.TRAY_URL));
+		trayItem.setImage(ImageUtil.getInstance().getImage(
+				Constants.Shell_Constant.TRAY_URL));
 		trayItem.addSelectionListener(new SelectionAdapter() {
 			public void widgetSelected(SelectionEvent e) {
 				toggleDisplay();
@@ -349,7 +359,6 @@ public class LoginMainWindow extends MainWindow implements Closer {
 			e.printStackTrace();
 		}
 	}
-
 
 	public static void main(String[] args) {
 		new LoginMainWindow();
