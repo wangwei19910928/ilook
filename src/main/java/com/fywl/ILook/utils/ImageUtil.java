@@ -10,7 +10,11 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.WritableRaster;
 import java.io.InputStream;
+import java.net.URLClassLoader;
 import java.util.Stack;
+
+import javax.imageio.ImageIO;
+import javax.swing.JFrame;
 
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
@@ -69,16 +73,20 @@ public class ImageUtil {
 	public ImageData convertToSWT(BufferedImage bufferedImage) {
 
 		if (bufferedImage.getColorModel() instanceof ComponentColorModel) {
-			ComponentColorModel colorModel = (ComponentColorModel) bufferedImage.getColorModel();
+			ComponentColorModel colorModel = (ComponentColorModel) bufferedImage
+					.getColorModel();
 			PaletteData palette = new PaletteData(0x0000FF, 0x00FF00, 0xFF0000);
-			ImageData data = new ImageData(bufferedImage.getWidth(), bufferedImage.getHeight(), colorModel.getPixelSize(), palette);
+			ImageData data = new ImageData(bufferedImage.getWidth(),
+					bufferedImage.getHeight(), colorModel.getPixelSize(),
+					palette);
 			data.transparentPixel = -1;
 			WritableRaster raster = bufferedImage.getRaster();
 			int[] pixelArray = new int[3];
 			for (int y = 0; y < data.height; y++) {
 				for (int x = 0; x < data.width; x++) {
 					raster.getPixel(x, y, pixelArray);
-					int pixel = palette.getPixel(new RGB(pixelArray[0], pixelArray[1], pixelArray[2]));
+					int pixel = palette.getPixel(new RGB(pixelArray[0],
+							pixelArray[1], pixelArray[2]));
 					data.setPixel(x, y, pixel);
 				}
 			}
@@ -118,12 +126,15 @@ public class ImageUtil {
 
 		if (!images.isEmpty()) {
 			ScreenImage deskTopImage = images.pop();
-			BufferedImage combined = new BufferedImage(deskTopImage.getRect().width, deskTopImage.getRect().height, BufferedImage.TYPE_3BYTE_BGR);
+			BufferedImage combined = new BufferedImage(
+					deskTopImage.getRect().width,
+					deskTopImage.getRect().height, BufferedImage.TYPE_3BYTE_BGR);
 			Graphics g = combined.getGraphics();
 			g.drawImage(deskTopImage.getImage(), 0, 0, null);
 			while (!images.isEmpty()) {
 				ScreenImage image = images.pop();
-				g.drawImage(image.getImage(), image.getRect().x, image.getRect().y, null);
+				g.drawImage(image.getImage(), image.getRect().x,
+						image.getRect().y, null);
 			}
 			return combined;
 		}
@@ -133,7 +144,8 @@ public class ImageUtil {
 
 	private BufferedImage capture(HWND hWnd) {
 
-		HDC hdcWindow = GDI32Extra.INSTANCE.GetDCEx(hWnd, null, GDI32Extra.DCX_WINDOW);
+		HDC hdcWindow = GDI32Extra.INSTANCE.GetDCEx(hWnd, null,
+				GDI32Extra.DCX_WINDOW);
 		HDC hdcMemDC = GDI32.INSTANCE.CreateCompatibleDC(hdcWindow);
 
 		RECT bounds = new RECT();
@@ -142,10 +154,12 @@ public class ImageUtil {
 		int width = bounds.right - bounds.left;
 		int height = bounds.bottom - bounds.top;
 
-		HBITMAP hBitmap = GDI32.INSTANCE.CreateCompatibleBitmap(hdcWindow, width, height);
+		HBITMAP hBitmap = GDI32.INSTANCE.CreateCompatibleBitmap(hdcWindow,
+				width, height);
 
 		HANDLE hOld = GDI32.INSTANCE.SelectObject(hdcMemDC, hBitmap);
-		GDI32Extra.INSTANCE.BitBlt(hdcMemDC, 0, 0, width, height, hdcWindow, 0, 0, WinGDIExtra.SRCCOPY);
+		GDI32Extra.INSTANCE.BitBlt(hdcMemDC, 0, 0, width, height, hdcWindow, 0,
+				0, WinGDIExtra.SRCCOPY);
 
 		GDI32.INSTANCE.SelectObject(hdcMemDC, hOld);
 		GDI32.INSTANCE.DeleteDC(hdcMemDC);
@@ -158,10 +172,13 @@ public class ImageUtil {
 		bmi.bmiHeader.biCompression = WinGDI.BI_RGB;
 
 		Memory buffer = new Memory(width * height * 4);
-		GDI32.INSTANCE.GetDIBits(hdcWindow, hBitmap, 0, height, buffer, bmi, WinGDI.DIB_RGB_COLORS);
+		GDI32.INSTANCE.GetDIBits(hdcWindow, hBitmap, 0, height, buffer, bmi,
+				WinGDI.DIB_RGB_COLORS);
 
-		BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_RGB);
-		image.setRGB(0, 0, width, height, buffer.getIntArray(0, width * height), 0, width);
+		BufferedImage image = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_RGB);
+		image.setRGB(0, 0, width, height,
+				buffer.getIntArray(0, width * height), 0, width);
 
 		GDI32.INSTANCE.DeleteObject(hBitmap);
 		User32.INSTANCE.ReleaseDC(hWnd, hdcWindow);
@@ -176,7 +193,8 @@ public class ImageUtil {
 			User32Extra.INSTANCE.GetWindowRect(hwnd, bounds);
 			Rectangle rect = bounds.toRectangle();
 
-			if (rect.getWidth() == size.getWidth() && rect.getHeight() == size.getHeight()) {
+			if (rect.getWidth() == size.getWidth()
+					&& rect.getHeight() == size.getHeight()) {
 				return robot.createScreenCapture(rect);
 			}
 		} catch (Exception e) {
@@ -184,15 +202,28 @@ public class ImageUtil {
 		}
 		return null;
 	}
-	
+
 	/**
 	 * 设置图标
+	 * 
 	 * @param d
 	 * @param is
 	 * @return
 	 */
-	public Image getImage(Device d,InputStream is){
+	public Image getImage(Device d, InputStream is) {
 		return new Image(d, is);
+	}
+
+	
+	public BufferedImage getBufferedImage(String fileName) {
+		BufferedImage bid = null;
+		try {
+			ClassLoader cl = this.getClass().getClassLoader();
+			bid = ImageIO.read(cl.getResourceAsStream(fileName));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return bid;
 	}
 
 }

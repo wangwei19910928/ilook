@@ -15,12 +15,10 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
-import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
-import com.fywl.ILook.bean.FormFieldKeyValuePair;
 import com.fywl.ILook.bean.UploadFileItem;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.listener.MoveableListener;
@@ -157,22 +155,22 @@ public class UploadPanel extends Composite implements Closer {
 				String endTime = dateTime1.getText();
 				String bz = textBZ.getText();
 
-				ArrayList<FormFieldKeyValuePair> ffkvp = new ArrayList<FormFieldKeyValuePair>();
-				ffkvp.add(new FormFieldKeyValuePair("title", bt));
-				ffkvp.add(new FormFieldKeyValuePair("tag", bq));
-				ffkvp.add(new FormFieldKeyValuePair("key", a.toString()));
-				ffkvp.add(new FormFieldKeyValuePair("type", km));
-				ffkvp.add(new FormFieldKeyValuePair("flag", radio1
-						.getSelection() ? true + "" : false + ""));
-				ffkvp.add(new FormFieldKeyValuePair("beginTime", beginTime));
-				ffkvp.add(new FormFieldKeyValuePair("endTime", endTime));
-				ffkvp.add(new FormFieldKeyValuePair("info", bz));
+//				ArrayList<FormFieldKeyValuePair> ffkvp = new ArrayList<FormFieldKeyValuePair>();
+//				ffkvp.add(new FormFieldKeyValuePair("title", bt));
+//				ffkvp.add(new FormFieldKeyValuePair("tag", bq));
+//				ffkvp.add(new FormFieldKeyValuePair("key", a.toString()));
+//				ffkvp.add(new FormFieldKeyValuePair("type", km));
+//				ffkvp.add(new FormFieldKeyValuePair("flag", radio1
+//						.getSelection() ? true + "" : false + ""));
+//				ffkvp.add(new FormFieldKeyValuePair("beginTime", beginTime));
+//				ffkvp.add(new FormFieldKeyValuePair("endTime", endTime));
+//				ffkvp.add(new FormFieldKeyValuePair("info", bz));
 
 				ArrayList<UploadFileItem> ufi = new ArrayList<UploadFileItem>();
 				videoName = "E://ssdgdfg" + File.separator
 						+ "1441772929866test.mp4";
 				ufi.add(new UploadFileItem("upload1", videoName));
-				String response;
+				String response="";
 				try {
 					// 上传状态 遮罩层
 					final Composite mp = new Composite(confirmLabel.getParent()
@@ -181,16 +179,11 @@ public class UploadPanel extends Composite implements Closer {
 					mp.moveAbove(null);
 					// 展现层
 					Composite mp1 = new EmptyPanel(mp, SWT.NONE, "正在上传");
-					mp1.setBounds(100, 100, 300, 240);
-					mp1.setBackground(SWTResourceManager
-							.getColor(SWT.COLOR_GRAY));
-					mp1.moveAbove(null);
+//					// 进度条
+//					ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
+//					pb.setBounds(100, 110, 100, 20);
 
-					// 进度条
-					ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
-					pb.setBounds(100, 110, 100, 20);
-
-					// 请求服务器
+//					// 请求服务器
 					response = HttpRequest.uploadFile(
 							Constants.UPLOAD_Constant.HTTP_UPLOAD_URL,
 							videoName);

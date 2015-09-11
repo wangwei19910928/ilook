@@ -18,7 +18,9 @@ import javax.sound.sampled.LineUnavailableException;
 import javax.sound.sampled.TargetDataLine;
 
 import com.fywl.ILook.bean.Constants;
+import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.ui.listener.VideoListener;
+import com.fywl.ILook.utils.ImageUtil;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamResolution;
 import com.xuggle.ferry.IBuffer;
@@ -38,6 +40,8 @@ public class VideoRecorder implements ImageRecorder {
 	private VideoPlayBackPanel otherVideoPlayback = null;
 
 	private MediaReader reader = null;
+	
+	private RecordConfig config;
 
 	public static boolean recordVideo = true;
 
@@ -48,7 +52,8 @@ public class VideoRecorder implements ImageRecorder {
 	}
 
 	public VideoRecorder(ScreenPlayBackPanel screenPlayBackPanel,
-			VideoPlayBackPanel otherVideoPlayback) {
+			VideoPlayBackPanel otherVideoPlayback,RecordConfig config) {
+		this.config = config;
 		reader = new MediaReader();
 		this.screenPlayBackPanel = screenPlayBackPanel;
 		this.otherVideoPlayback = otherVideoPlayback;
@@ -113,9 +118,9 @@ public class VideoRecorder implements ImageRecorder {
 	private void draw(BufferedImage screen) {
 		if (g != null && screen != null) {
 			if (recordVideo) {
-				g.drawImage(screen, 320, 90, 960, 540, null);
-			} else {
-				g.drawImage(screen, 0, 240, 320, 240, null);
+				g.drawImage(screen, 246, 0, 1600, 900, null);
+//			} else {
+//				g.drawImage(screen, 0, 240, 240, 180, null);
 			}
 		}
 	}
@@ -136,9 +141,12 @@ public class VideoRecorder implements ImageRecorder {
 class MediaReader implements Runnable {
 	public ExecutorService executor = Executors.newFixedThreadPool(2);
 
+//	public Dimension videoSize = new Dimension(1600, 900);
 	public Dimension videoSize = WebcamResolution.HD720.getSize();
 
 	private BufferedImage combined = null;
+	
+	private RecordConfig config;
 
 	private Graphics g = null;
 
@@ -160,11 +168,15 @@ class MediaReader implements Runnable {
 	Properties properties;
 
 	String videoName;
+	
+	public MediaReader(){
+		
+	}
 
-	public MediaReader() {
+	public MediaReader(RecordConfig config) {
+		this.config = config;
 		combined = new BufferedImage((int) videoSize.getWidth(),
 				(int) videoSize.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
-
 		File file = new File("user.properties");
 		FileInputStream fis;
 		try {
@@ -217,12 +229,12 @@ class MediaReader implements Runnable {
 		return format;
 	}
 
-//	private BufferedImage deepCopy(BufferedImage bi) {
-//		ColorModel cm = bi.getColorModel();
-//		boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
-//		WritableRaster raster = bi.copyData(null);
-//		return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
-//	}
+	// private BufferedImage deepCopy(BufferedImage bi) {
+	// ColorModel cm = bi.getColorModel();
+	// boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+	// WritableRaster raster = bi.copyData(null);
+	// return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	// }
 
 	@Override
 	public void run() {
@@ -254,7 +266,7 @@ class MediaReader implements Runnable {
 		try {
 			byte[] audioBuf = new byte[line.getBufferSize() / 5];
 
-			VideoListener faceVideo = new VideoListener(g, 0, 0, 320, 240);
+			VideoListener faceVideo = new VideoListener(g, 0, 0, 240, 180);
 			Webcam.getWebcams().get(0).addWebcamListener(faceVideo);
 
 			// VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
@@ -297,7 +309,14 @@ class MediaReader implements Runnable {
 			AudioFormat format, VideoListener secVideo,
 			VideoListener secVideo1, TargetDataLine line) {
 		changeVideo(secVideo, secVideo1);
-
+//		g.setFont(new Font(null, Font.BOLD, 15));
+//		g.drawString(
+//				"这是课件这是课件这是",
+//				0, 500);
+		BufferedImage bix = ImageUtil.getInstance().getBufferedImage("images/separated_x.png");
+		BufferedImage biy = ImageUtil.getInstance().getBufferedImage("images/separated_y.png");
+		g.drawImage(bix, 0, 181, 240, 1, null);
+		g.drawImage(biy, 241, 0, 5, 768, null);
 		IConverter converter = ConverterFactory.createConverter(combined,
 				IPixelFormat.Type.YUV420P);
 		IVideoPicture frame = converter.toPicture(combined,
@@ -316,20 +335,20 @@ class MediaReader implements Runnable {
 
 		writer.encodeVideo(0, frame);
 		writer.encodeAudio(1, smp);
-		
-//		new Thread(new Runnable() {
-//			public void run() {
-//				System.out.println("进入run");
-//				Display.getDefault().asyncExec(new Runnable() {
-//					@Override
-//					public void run() {
-//						System.out.println("终于执行了");
-//						infoLabel.setText("系统将在:" + i + "秒后自动重启");
-//					}
-//				});
-//			}
-//		}).start();
-//		infoLabel.getParent().layout();
+
+		// new Thread(new Runnable() {
+		// public void run() {
+		// System.out.println("进入run");
+		// Display.getDefault().asyncExec(new Runnable() {
+		// @Override
+		// public void run() {
+		// System.out.println("终于执行了");
+		// infoLabel.setText("系统将在:" + i + "秒后自动重启");
+		// }
+		// });
+		// }
+		// }).start();
+		// infoLabel.getParent().layout();
 	}
 
 	void changePause() {
@@ -352,9 +371,9 @@ class MediaReader implements Runnable {
 			if (changeCount % 2 == 0) {
 				Webcam.getWebcams().get(1).removeWebcamListener(secVideo);
 				Webcam.getWebcams().get(1).addWebcamListener(secVideo1);
-			} else {
-				Webcam.getWebcams().get(1).removeWebcamListener(secVideo1);
-				Webcam.getWebcams().get(1).addWebcamListener(secVideo);
+//			} else {
+//				Webcam.getWebcams().get(1).removeWebcamListener(secVideo1);
+//				Webcam.getWebcams().get(1).addWebcamListener(secVideo);
 			}
 			changeFlag = false;
 		}
@@ -362,9 +381,9 @@ class MediaReader implements Runnable {
 
 	// 初始化状态参数
 	private void initParam() {
-		secVideo = new VideoListener(g, 0, 240, 320, 240);
+		secVideo = new VideoListener(g, 0, 210, 240, 180);
 
-		secVideo1 = new VideoListener(g, 320, 90, 960, 540);
+		secVideo1 = new VideoListener(g, 240, 0, 1024, 768);
 		// 录制状态
 		record = true;
 		// 暂停状态

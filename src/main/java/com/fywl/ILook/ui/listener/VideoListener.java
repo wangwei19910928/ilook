@@ -1,6 +1,7 @@
 package com.fywl.ILook.ui.listener;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import com.github.sarxos.webcam.WebcamEvent;
@@ -54,6 +55,12 @@ public class VideoListener implements WebcamListener {
 		if (g != null) {
 			BufferedImage image = ConverterFactory.convertToType(we.getImage(), BufferedImage.TYPE_3BYTE_BGR);
 			g.drawImage(image, x, y, width, height, null);
+			
+//			g.drawImage(image, 0, 0, width, height, width, 0, 0, height, null);
+//			Graphics2D g2d = (Graphics2D)g;  
+//	        g2d.rotate(180,width/2,height/2);  
+//	        g2d.drawImage(img,100,100,300,300,null);
+//	        g2d.drawImage(image, x, y, width, height, null);
 		}
 	}
 

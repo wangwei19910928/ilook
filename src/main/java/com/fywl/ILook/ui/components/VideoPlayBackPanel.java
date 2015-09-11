@@ -24,14 +24,20 @@ public class VideoPlayBackPanel extends Composite {
 
 	private JRootPane root = new JRootPane();
 
-	private Dimension size = WebcamResolution.QVGA.getSize();
+	private Dimension size = WebcamResolution.VGA.getSize();
 
 	private boolean running = false;
 
 	private boolean mirrored = false;
 
 	private Webcam webcam;
-
+	Dimension[] nonStandardResolutions = new Dimension[] {
+//			WebcamResolution.PAL.getSize(),
+//			WebcamResolution.HD720.getSize(),
+//			new Dimension(2000, 1000),
+//			new Dimension(1024, 768),
+			new Dimension(2048, 1536),
+		};
 	public VideoPlayBackPanel(Composite parent, RecordConfig config,
 			int index) {
 		super(parent, SWT.EMBEDDED);
@@ -39,6 +45,12 @@ public class VideoPlayBackPanel extends Composite {
 		Webcam wb = Webcam.getWebcams().get(index);
 		if (null != wb) {
 			webcam = wb;
+			webcam.setViewSize(size);
+			if(1 == index){
+				webcam.setCustomViewSizes(nonStandardResolutions);
+				webcam.setViewSize(new Dimension(2048, 1536));
+			}
+			
 		}
 		init();
 	}
@@ -50,7 +62,7 @@ public class VideoPlayBackPanel extends Composite {
 
 	public void start() {
 		if (webcam != null) {
-			webcam.setViewSize(size);
+//			webcam.setViewSize(size);
 			panel = new WebcamPanel(webcam, size, false);
 			root.getContentPane().add(panel);
 			frame.setVisible(true);

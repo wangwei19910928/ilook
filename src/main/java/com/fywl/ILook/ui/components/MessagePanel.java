@@ -14,7 +14,8 @@ import com.fywl.ILook.utils.ImageUtil;
 
 public class MessagePanel extends Composite implements Closer {
 	
-	private Label label;
+	private Label leftLabel;
+	private Label rightLabel;
 	public MessagePanel(Composite parent, int style) {
 		super(parent, style);
 	}
@@ -52,7 +53,7 @@ public class MessagePanel extends Composite implements Closer {
 		Image giveupImage = ImageUtil.getInstance().getImage(this.getDisplay(),
 				this.getClass().getResourceAsStream(iconUrl));
 		icon.setImage(giveupImage);
-		icon.setBounds(30, 90, 30, 60);
+		icon.setBounds(30, 90, 50, 50);
 
 		// 第一句话
 		int[] firstLocation = { 80, 80, 240, 20 };
@@ -64,15 +65,18 @@ public class MessagePanel extends Composite implements Closer {
 		int[] thirdLocation = { 80, 140, 240, 20 };
 		new MyLabel(this, SWT.NONE, thirdText, thirdLocation);
 		
-		label.setBackground(SWTResourceManager.getColor(
-				Constants.Shell_Constant.BACKGROUND[0],
-				Constants.Shell_Constant.BACKGROUND[1],
-				Constants.Shell_Constant.BACKGROUND[2]));
-		label.setBounds(240, 180, 80, 20);
+		leftLabel.setBounds(40, 180, 150, 30);
+		
+		rightLabel.setBounds(220, 180, 100, 30);
+	}
+
+	public void setLeftLabel(Label leftLabel) {
+		this.leftLabel = leftLabel;
+	}
+
+	public void setRightLabel(Label rightLabel) {
+		this.rightLabel = rightLabel;
 	}
 
 
-	public void setLabel(Label label) {
-		this.label = label;
-	}
 }

@@ -65,7 +65,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 		otherVideoPlayback = new VideoPlayBackPanel(shell, config, 1);
 
-		recorder = new VideoRecorder(screenPlayBackPanel, otherVideoPlayback);
+		recorder = new VideoRecorder(screenPlayBackPanel, otherVideoPlayback,config);
 
 		tray = display.getSystemTray();
 	}

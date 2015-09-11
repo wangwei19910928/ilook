@@ -1,5 +1,11 @@
 package com.fywl.ILook.ui.components.panel.impl;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.util.Properties;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
@@ -19,7 +25,7 @@ import com.fywl.ILook.utils.ImageUtil;
 public class ToolPanel extends Panel {
 
 	private boolean pauseFlag = false;
-
+	
 	public ToolPanel(Closer closer, Composite parent, int style,
 			VideoRecorder recorder) {
 		super(closer, parent, style, recorder);
@@ -27,7 +33,10 @@ public class ToolPanel extends Panel {
 
 	@Override
 	protected void init() {
-		//显示录制时间的五个label
+		final File file = new File("user.properties");
+		final Properties properties = new Properties();
+		
+		// 显示录制时间的五个label
 		Label ylzLabel = new Label(this, SWT.NONE);
 		ylzLabel.setBounds(384, 5, 40, 30);
 		ylzLabel.setText("已录制:");
@@ -45,8 +54,8 @@ public class ToolPanel extends Panel {
 		Label secondsLabel = new Label(this, SWT.NONE);
 		secondsLabel.setBounds(480, 5, 20, 30);
 		secondsLabel.setText("秒");
-		
-		//开始按钮
+
+		// 开始按钮
 		final Label beginBtn = new Label(this, SWT.NONE);
 		beginBtn.setBounds(Constants.TOOL_PANEL_Constant.CAMERA_LOCATION[0],
 				Constants.TOOL_PANEL_Constant.CAMERA_LOCATION[1],
@@ -84,12 +93,18 @@ public class ToolPanel extends Panel {
 					beginBtn.setImage(workingImage);
 					beginBtn.setToolTipText("暂停录制");
 					recording = !recording;
+					
+					//修改最佳录制分辨率
+//					GraphicsEnvironment environment = GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+//					GraphicsDevice device=environment.getDefaultScreenDevice(); 
+//					DisplayMode displayMode=new DisplayMode(1024,768,16,75); 
+//					device.setDisplayMode(displayMode);
 				}
 			}
 		});
-		
-		//结束按钮
-		Label sBtn = new Label(this, SWT.NONE);
+
+		// 结束按钮
+		final Label sBtn = new Label(this, SWT.NONE);
 		Image stopImage = ImageUtil.getInstance().getImage(
 				this.getDisplay(),
 				this.getClass().getResourceAsStream(
@@ -107,17 +122,22 @@ public class ToolPanel extends Panel {
 				initBegin(beginBtn, beginImage);
 				recorder.finish();
 				if (recorder.getTime() > 0) {
-					//  遮罩层
-					final Composite zz = new Composite(beginBtn.getParent()
-							.getShell(), SWT.NO_BACKGROUND);
+					// 遮罩层
+					final Composite zz = new Composite(beginBtn.getShell(),
+							SWT.NO_BACKGROUND);
 					zz.setBounds(0, 0, 500, 440);
 					zz.moveAbove(null);
-					final MessagePanel mp = new MessagePanel(zz,
-							SWT.NONE);
+					final MessagePanel mp = new MessagePanel(zz, SWT.NONE);
 					mp.moveAbove(null);
 					mp.setBounds(100, 100, 350, 290);
+					//右侧的上传按钮
 					int[] location = { 0, 0, 0, 0 };
-					Label label = new MyLabel(mp, SWT.NONE, "  上 传  ", location);
+					Label label = new MyLabel(mp, SWT.NONE, "", location);
+					Image rImage = ImageUtil.getInstance().getImage(
+							sBtn.getDisplay(),
+							this.getClass().getResourceAsStream(
+									"/images/upload.png"));
+					label.setImage(rImage);
 					label.addListener(SWT.MouseUp, new Listener() {
 						@Override
 						public void handleEvent(Event event) {
@@ -127,16 +147,53 @@ public class ToolPanel extends Panel {
 							zz.dispose();
 						}
 					});
-					mp.setLabel(label);
+					mp.setRightLabel(label);
+					//左侧的打开文件夹按钮
+					Label llabel = new MyLabel(mp, SWT.NONE, "", location);
+					Image lImage = ImageUtil.getInstance().getImage(
+							sBtn.getDisplay(),
+							this.getClass().getResourceAsStream(
+									"/images/openfolder.png"));
+					llabel.setImage(lImage);
+					llabel.addListener(SWT.MouseUp, new Listener() {
+						@Override
+						public void handleEvent(Event event) {
+							try {
+								FileInputStream fis;
+								if (!file.exists()) {
+									file.createNewFile();
+								}
+								fis = new FileInputStream(file);
+								properties.load(fis);
+								fis.close();
+							} catch (FileNotFoundException e1) {
+								e1.printStackTrace();
+							} catch (IOException e) {
+								e.printStackTrace();
+							}
+							String str = Constants.SETUP_Constant.videoPath;
+							String videoPath = properties.getProperty("videoPath");
+							if(null != videoPath && !videoPath.equals("")){
+								str = videoPath;
+							}
+							try {
+								Runtime.getRuntime().exec("explorer " + str);
+							} catch (IOException e) {
+								// TODO Auto-generated catch block
+								e.printStackTrace();
+							}
+						}
+					});
+					mp.setLeftLabel(llabel);
 					int time = recorder.getTime() / 10;
-					mp.init("/images/save.png", "微课已成功保存", "总时长" + time / 3600
+					mp.init("/images/saveflag.png", "微课已成功保存", "总时长" + time / 3600
 							+ ":" + time / 60 + ":" + time % 60,
 							"点击上传添加相应信息即可上传");
 				}
 			}
 		});
-		
-		//放弃按钮
+
+		// 放弃按钮
 		Label gBtn = new Label(this, SWT.NONE);
 		Image giveupImage = ImageUtil.getInstance().getImage(
 				this.getDisplay(),
@@ -156,16 +213,20 @@ public class ToolPanel extends Panel {
 					initBegin(beginBtn, beginImage);
 					recording = false;
 					recorder.finish();
-				//  遮罩层
+					// 遮罩层
 					final Composite zz = new Composite(beginBtn.getParent()
 							.getShell(), SWT.NO_BACKGROUND);
 					zz.setBounds(0, 0, 500, 440);
 					zz.moveAbove(null);
-					final MessagePanel mp = new MessagePanel(zz,
-							SWT.NONE);
+					final MessagePanel mp = new MessagePanel(zz, SWT.NONE);
 					mp.setBounds(100, 100, 350, 290);
 					int[] location = { 0, 0, 0, 0 };
 					Label label = new MyLabel(mp, SWT.NONE, "  重 录  ", location);
+					Image cImage = ImageUtil.getInstance().getImage(
+							sBtn.getDisplay(),
+							this.getClass().getResourceAsStream(
+									"/images/retake.png"));
+					label.setImage(cImage);
 					label.addListener(SWT.MouseUp, new Listener() {
 						@Override
 						public void handleEvent(Event event) {
@@ -176,9 +237,23 @@ public class ToolPanel extends Panel {
 							zz.dispose();
 						}
 					});
-					mp.setLabel(label);
+					mp.setRightLabel(label);
+					//左侧的返回主界面按钮
+					Label llabel = new MyLabel(mp, SWT.NONE, "", location);
+					Image lImage = ImageUtil.getInstance().getImage(
+							sBtn.getDisplay(),
+							this.getClass().getResourceAsStream(
+									"/images/returnmain.png"));
+					llabel.setImage(lImage);
+					llabel.addListener(SWT.MouseUp, new Listener() {
+						@Override
+						public void handleEvent(Event event) {
+							zz.dispose();
+						}
+					});
+					mp.setLeftLabel(llabel);
 					int time = recorder.getTime() / 10;
-					mp.init("/images/save.png", "执行此操作将放弃当前微课！", "总时长" + time
+					mp.init("/images/warning.png", "执行此操作将放弃当前微课！", "总时长" + time
 							/ 3600 + ":" + time / 60 + ":" + time % 60,
 							"您可以选择重录或者回到主页面");
 					mp.moveAbove(zz);
@@ -200,7 +275,7 @@ public class ToolPanel extends Panel {
 		getDisplay().timerExec(800, new Runnable() {
 			public void run() {
 				int count = recorder.getTime() / 10;
-				minuteLabel.setText(count / 60+ "");
+				minuteLabel.setText(count / 60 + "");
 				secondLabel.setText(count % 60 + "");
 				getDisplay().timerExec(800, this);
 			}

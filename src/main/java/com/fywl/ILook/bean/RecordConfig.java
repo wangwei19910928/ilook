@@ -1,5 +1,6 @@
 package com.fywl.ILook.bean;
 
+import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeListener;
 import java.beans.PropertyChangeSupport;
@@ -37,6 +38,9 @@ public class RecordConfig {
 	private int framesRate = 30;
 
 	private Rectangle frameDimension;
+	
+	//录制的尺寸
+	private Dimension videoSize;
 
 	public RecordConfig() {
 
@@ -155,5 +159,13 @@ public class RecordConfig {
 
 	public void setScreenRecording(boolean screenRecording) {
 		this.screenRecording = screenRecording;
+	}
+
+	public Dimension getVideoSize() {
+		return videoSize;
+	}
+
+	public void setVideoSize(Dimension videoSize) {
+		this.videoSize = videoSize;
 	}
 }

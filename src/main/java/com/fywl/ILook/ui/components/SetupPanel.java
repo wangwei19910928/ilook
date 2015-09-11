@@ -45,6 +45,7 @@ public class SetupPanel extends Composite implements Closer {
 			}
 			fis = new FileInputStream(file);
 			properties.load(fis);
+			fis.close();
 		} catch (FileNotFoundException e1) {
 			e1.printStackTrace();
 		} catch (IOException e) {
@@ -187,7 +188,9 @@ public class SetupPanel extends Composite implements Closer {
 				folderdlg.setMessage("请选择储存位置");
 				// 打开文件对话框，返回选中文件夹目录
 				String selecteddir = folderdlg.open();
-				cunchu.setText(selecteddir);
+				if(null != selecteddir && !"".equals(selecteddir)){
+					cunchu.setText(selecteddir);
+				}
 			}
 		});
 
