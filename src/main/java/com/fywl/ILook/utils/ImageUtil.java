@@ -117,9 +117,7 @@ public class ImageUtil {
 					 if (wText.isEmpty() && !TASK_BAR.equals(className)) {
 					 return true;
 					 }
-//					if ("爱录课".equals(wText)) {
-//						return true;
-//					}
+					 
 					RECT bounds = new RECT();
 					user32.GetWindowRect(hWnd, bounds);
 					Rectangle rect = bounds.toRectangle();
@@ -135,10 +133,6 @@ public class ImageUtil {
 						// BufferedImage screen = capture(hWnd);
 						BufferedImage screen = capture(hWnd, flag);
 						if (screen != null) {
-							System.out.println(screen.getHeight() + "---"
-									+ screen.getWidth());
-							System.out.println(wText);
-							System.out.println(rect.x + "=" + rect.y);
 							ScreenImage image = new ScreenImage(screen, rect);
 							if("Program Manager".equals(wText))
 								deskTopImage = image;
@@ -160,14 +154,10 @@ public class ImageUtil {
 			g.drawImage(deskTopImage.getImage(), 0, 0, null);
 			while (!images.isEmpty()) {
 				ScreenImage image = images.pop();
-				System.out.println("image.getRect().x=" + image.getRect().x
-						+ "         image.getRect().y=" + image.getRect().y);
 				g.drawImage(image.getImage(), image.getRect().x,
 						image.getRect().y, null);
 			}
 			return combined;
-		} else {
-			System.out.println("真的为空啦");
 		}
 
 		return null;
