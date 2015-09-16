@@ -10,11 +10,9 @@ import java.awt.image.BufferedImage;
 import java.awt.image.ComponentColorModel;
 import java.awt.image.WritableRaster;
 import java.io.InputStream;
-import java.net.URLClassLoader;
 import java.util.Stack;
 
 import javax.imageio.ImageIO;
-import javax.swing.JFrame;
 
 import org.eclipse.swt.graphics.Device;
 import org.eclipse.swt.graphics.Image;
@@ -40,6 +38,8 @@ import com.sun.jna.platform.win32.WinNT.HANDLE;
 import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 
 public class ImageUtil {
+	
+	private static final String TASK_BAR = "Shell_TrayWnd";
 
 	private static final User32Extra user32 = User32Extra.INSTANCE;
 
@@ -95,6 +95,8 @@ public class ImageUtil {
 		return null;
 	}
 
+	//单独存放桌面  否则会造成stack错乱（已发现的输入法会比桌面后入stack）
+	ScreenImage deskTopImage;
 	public BufferedImage screenCapture() {
 
 		final Stack<ScreenImage> images = new Stack<>();
@@ -105,18 +107,43 @@ public class ImageUtil {
 				byte[] windowText = new byte[512];
 				user32.GetWindowTextA(hWnd, windowText, 512);
 				if (user32.IsWindowVisible(hWnd)) {
+					char[] lpClassName = new char[512];
+					user32.GetClassName(hWnd, lpClassName, 512);
+					String className = Native.toString(lpClassName);
 					String wText = Native.toString(windowText, "GBK");
-					if (wText.isEmpty() || "开始".equals(wText)) {
-						return true;
-					}
+					// if (wText.isEmpty() || "开始".equals(wText)) {
+					// return true;
+					// }
+					 if (wText.isEmpty() && !TASK_BAR.equals(className)) {
+					 return true;
+					 }
+//					if ("爱录课".equals(wText)) {
+//						return true;
+//					}
 					RECT bounds = new RECT();
 					user32.GetWindowRect(hWnd, bounds);
 					Rectangle rect = bounds.toRectangle();
 					if (bounds.left > -32000) {
-						BufferedImage screen = capture(hWnd);
+						/*
+						 * 开始图标 和 任务栏透明
+						 */
+						boolean flag = false;
+						if ("开始".equals(wText)
+								|| TASK_BAR.equals(className)) {
+							flag = true;
+						}
+						// BufferedImage screen = capture(hWnd);
+						BufferedImage screen = capture(hWnd, flag);
 						if (screen != null) {
+							System.out.println(screen.getHeight() + "---"
+									+ screen.getWidth());
+							System.out.println(wText);
+							System.out.println(rect.x + "=" + rect.y);
 							ScreenImage image = new ScreenImage(screen, rect);
-							images.push(image);
+							if("Program Manager".equals(wText))
+								deskTopImage = image;
+							else
+								images.push(image);
 						}
 					}
 				}
@@ -125,7 +152,7 @@ public class ImageUtil {
 		}, null);
 
 		if (!images.isEmpty()) {
-			ScreenImage deskTopImage = images.pop();
+//			ScreenImage deskTopImage = images.pop();
 			BufferedImage combined = new BufferedImage(
 					deskTopImage.getRect().width,
 					deskTopImage.getRect().height, BufferedImage.TYPE_3BYTE_BGR);
@@ -133,10 +160,14 @@ public class ImageUtil {
 			g.drawImage(deskTopImage.getImage(), 0, 0, null);
 			while (!images.isEmpty()) {
 				ScreenImage image = images.pop();
+				System.out.println("image.getRect().x=" + image.getRect().x
+						+ "         image.getRect().y=" + image.getRect().y);
 				g.drawImage(image.getImage(), image.getRect().x,
 						image.getRect().y, null);
 			}
 			return combined;
+		} else {
+			System.out.println("真的为空啦");
 		}
 
 		return null;
@@ -186,13 +217,77 @@ public class ImageUtil {
 		return image;
 	}
 
+	/**
+	 * 画出透明图
+	 * 
+	 * @param hWnd
+	 * @param flag
+	 * @return
+	 */
+	private BufferedImage capture(HWND hWnd, boolean flag) {
+
+		HDC hdcWindow = GDI32Extra.INSTANCE.GetDCEx(hWnd, null,
+				GDI32Extra.DCX_WINDOW);
+		HDC hdcMemDC = GDI32.INSTANCE.CreateCompatibleDC(hdcWindow);
+
+		RECT bounds = new RECT();
+		User32Extra.INSTANCE.GetWindowRect(hWnd, bounds);
+
+		int width = bounds.right - bounds.left;
+		int height = bounds.bottom - bounds.top;
+		/*
+		 * 宽度不存在的直接返回
+		 */
+		if (0 == width && 0 == height) {
+			return null;
+		}
+
+		HBITMAP hBitmap = GDI32.INSTANCE.CreateCompatibleBitmap(hdcWindow,
+				width, height);
+
+		HANDLE hOld = GDI32.INSTANCE.SelectObject(hdcMemDC, hBitmap);
+		GDI32Extra.INSTANCE.BitBlt(hdcMemDC, 0, 0, width, height, hdcWindow, 0,
+				0, WinGDIExtra.SRCCOPY);
+
+		GDI32.INSTANCE.SelectObject(hdcMemDC, hOld);
+		GDI32.INSTANCE.DeleteDC(hdcMemDC);
+
+		BITMAPINFO bmi = new BITMAPINFO();
+		bmi.bmiHeader.biWidth = width;
+		bmi.bmiHeader.biHeight = -height;
+		bmi.bmiHeader.biPlanes = 1;
+		bmi.bmiHeader.biBitCount = 32;
+		bmi.bmiHeader.biCompression = WinGDI.BI_RGB;
+
+		Memory buffer = new Memory(width * height * 4);
+		GDI32.INSTANCE.GetDIBits(hdcWindow, hBitmap, 0, height, buffer, bmi,
+				WinGDI.DIB_RGB_COLORS);
+
+		BufferedImage image = new BufferedImage(width, height,
+				BufferedImage.TYPE_INT_RGB);
+		/*
+		 * 根据flag画出透明图像
+		 */
+		if (flag) {
+			image = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_ARGB);
+		}
+
+		image.setRGB(0, 0, width, height,
+				buffer.getIntArray(0, width * height), 0, width);
+
+		GDI32.INSTANCE.DeleteObject(hBitmap);
+		User32.INSTANCE.ReleaseDC(hWnd, hdcWindow);
+
+		return image;
+	}
+
 	public BufferedImage getAppFullScreen() {
 		try {
 			HWND hwnd = user32.GetForegroundWindow();
 			RECT bounds = new RECT();
 			User32Extra.INSTANCE.GetWindowRect(hwnd, bounds);
 			Rectangle rect = bounds.toRectangle();
-
 			if (rect.getWidth() == size.getWidth()
 					&& rect.getHeight() == size.getHeight()) {
 				return robot.createScreenCapture(rect);
@@ -214,7 +309,6 @@ public class ImageUtil {
 		return new Image(d, is);
 	}
 
-	
 	public BufferedImage getBufferedImage(String fileName) {
 		BufferedImage bid = null;
 		try {
