@@ -26,7 +26,7 @@ public class Test extends MainWindow implements Closer{
     
     
     public static void main(String[] args) {     
-    	new Test();
+    	//new Test();
     }
     @Override
 	protected void beforeComponentsInit() {

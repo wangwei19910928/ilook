@@ -125,7 +125,7 @@ public class ToolPanel extends Panel {
 					// 遮罩层
 					final Composite zz = new Composite(beginBtn.getShell(),
 							SWT.NO_BACKGROUND);
-					zz.setBounds(0, 0, 500, 440);
+					zz.setBounds(0, 30, 500, 410);
 					zz.moveAbove(null);
 					final MessagePanel mp = new MessagePanel(zz, SWT.NONE);
 					mp.moveAbove(null);
@@ -136,7 +136,7 @@ public class ToolPanel extends Panel {
 					Image rImage = ImageUtil.getInstance().getImage(
 							sBtn.getDisplay(),
 							this.getClass().getResourceAsStream(
-									"/images/upload.png"));
+									"/images/upload_upload.png"));
 					label.setImage(rImage);
 					label.addListener(SWT.MouseUp, new Listener() {
 						@Override
@@ -153,7 +153,7 @@ public class ToolPanel extends Panel {
 					Image lImage = ImageUtil.getInstance().getImage(
 							sBtn.getDisplay(),
 							this.getClass().getResourceAsStream(
-									"/images/openfolder.png"));
+									"/images/upload_open.png"));
 					llabel.setImage(lImage);
 					llabel.addListener(SWT.MouseUp, new Listener() {
 						@Override

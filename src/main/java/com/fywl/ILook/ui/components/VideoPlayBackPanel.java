@@ -9,7 +9,6 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 
-import com.fywl.ILook.bean.RecordConfig;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import com.github.sarxos.webcam.WebcamResolution;
@@ -20,7 +19,7 @@ public class VideoPlayBackPanel extends Composite {
 
 	private WebcamPanel panel;
 
-	private RecordConfig config;
+//	private RecordConfig config;
 
 	private JRootPane root = new JRootPane();
 
@@ -31,24 +30,26 @@ public class VideoPlayBackPanel extends Composite {
 	private boolean mirrored = false;
 
 	private Webcam webcam;
-	Dimension[] nonStandardResolutions = new Dimension[] {
-//			WebcamResolution.PAL.getSize(),
-//			WebcamResolution.HD720.getSize(),
-//			new Dimension(2000, 1000),
-//			new Dimension(1024, 768),
-			new Dimension(2048, 1536),
-		};
-	public VideoPlayBackPanel(Composite parent, RecordConfig config,
+	public VideoPlayBackPanel(Composite parent,
 			int index) {
 		super(parent, SWT.EMBEDDED);
-		this.config = config;
 		Webcam wb = Webcam.getWebcams().get(index);
 		if (null != wb) {
 			webcam = wb;
 			webcam.setViewSize(size);
 			if(1 == index){
+				mirrored = true;
+				Dimension[] nonStandardResolutions = new Dimension[] {
+						new Dimension(2048, 1536),
+					};
 				webcam.setCustomViewSizes(nonStandardResolutions);
 				webcam.setViewSize(new Dimension(2048, 1536));
+//			}else{
+//				Dimension[] nonStandardResolutions = new Dimension[] {
+//						new Dimension(1024, 768),
+//					};
+//				webcam.setCustomViewSizes(nonStandardResolutions);
+//				webcam.setViewSize(new Dimension(1024, 768));
 			}
 			
 		}
@@ -63,7 +64,9 @@ public class VideoPlayBackPanel extends Composite {
 	public void start() {
 		if (webcam != null) {
 //			webcam.setViewSize(size);
-			panel = new WebcamPanel(webcam, size, false);
+			panel = new WebcamPanel(webcam, webcam.getViewSize(), false);
+			panel.setFPSLimit(25);
+//			mirror();
 			root.getContentPane().add(panel);
 			frame.setVisible(true);
 			panel.start();

@@ -13,8 +13,9 @@ public  class MainWindow {
 
 	protected Shell shell = new Shell(display, SWT.ON_TOP);
 	
+	
 	public MainWindow() {
-		
+//		shell.setText("爱录课");
 	}
 	
 

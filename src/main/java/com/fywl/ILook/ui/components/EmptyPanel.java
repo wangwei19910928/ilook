@@ -1,6 +1,7 @@
 package com.fywl.ILook.ui.components;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
@@ -10,6 +11,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
+import com.fywl.ILook.utils.ImageUtil;
 
 /**
  * 提示框 父容器会被disposed
@@ -72,8 +74,13 @@ public class EmptyPanel extends Composite implements Closer {
 
 		// 底部按钮
 		final Label successLaber = new Label(this, SWT.NONE);
-		successLaber.setBounds(120, 50, 60, 20);
-		successLaber.setText(labelText);
+		Image confirmImage = ImageUtil.getInstance().getImage(
+				this.getDisplay(),
+				this.getClass().getResourceAsStream(
+						"/images/upload_confirm.png"));
+		successLaber.setImage(confirmImage);
+		successLaber.setBounds(120, 50, 80, 25);
+//		successLaber.setText(labelText);
 		successLaber.setBackground(SWTResourceManager.getColor(
 				Constants.Shell_Constant.BACKGROUND[0],
 				Constants.Shell_Constant.BACKGROUND[1],
@@ -113,12 +120,12 @@ public class EmptyPanel extends Composite implements Closer {
 		panel.setBackground(SWTResourceManager.getColor(SWT.COLOR_GRAY));
 		panel.setBounds(0, 30, 300, 90);
 
-		// 标题文字
-		int location1[] = { 0, 0, 300, 90 };
-		new MyLabel(panel, SWT.NONE, "请稍候···", location1);
+//		// 标题文字
+//		int location1[] = { 0, 0, 300, 90 };
+//		new MyLabel(panel, SWT.NONE, "请稍候···", location1);
 		
-		// 进度条
-		ProgressBar pb = new ProgressBar(panel, SWT.INDETERMINATE);
-		pb.setBounds(50, 40, 100, 20);
+//		// 进度条
+//		ProgressBar pb = new ProgressBar(panel, SWT.INDETERMINATE);
+//		pb.setBounds(50, 40, 100, 20);
 	}
 }

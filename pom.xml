@@ -84,6 +84,11 @@
 			<version>4.3</version>
 		</dependency>
 
+		<dependency>
+			<groupId>com.melloware</groupId>
+			<artifactId>jintellitype</artifactId>
+			<version>1.3.9</version>
+		</dependency>
 
 		<!-- 来自本地私服 -->
 		<dependency>
@@ -144,15 +149,15 @@
 						<inputTemplate>template.vm</inputTemplate>
 					</jnlp>
 					<sign>
-						<keystore>${project.build.outputDirectory}/keystore.jks</keystore>
-						<keypass>liupll1234</keypass>
-						<storepass>liupll1234</storepass>
-						<alias>MicroVideo</alias>
-						<dnameCn>MicroVideo</dnameCn>
-						<dnameOu>Argus</dnameOu>
-						<dnameO>Argus</dnameO>
-						<dnameL>TianJin</dnameL>
-						<dnameSt>TianJin</dnameSt>
+						<keystore>${project.build.outputDirectory}/keystore</keystore>
+						<keypass>123456</keypass>
+						<storepass>123456</storepass>
+						<alias>myalias</alias>
+						<dnameCn>wangwei</dnameCn>
+						<dnameOu>fywl</dnameOu>
+						<dnameO>fywl</dnameO>
+						<dnameL>tianjin</dnameL>
+						<dnameSt>tianjin</dnameSt>
 						<dnameC>CN</dnameC>
 						<verify>true</verify>
 						<keystoreConfig>
@@ -160,6 +165,23 @@
 							<gen>false</gen>
 						</keystoreConfig>
 					</sign>
+					<!-- <sign> -->
+					<!-- <keystore>${project.build.outputDirectory}/keystore.jks</keystore> -->
+					<!-- <keypass>liupll1234</keypass> -->
+					<!-- <storepass>liupll1234</storepass> -->
+					<!-- <alias>MicroVideo</alias> -->
+					<!-- <dnameCn>MicroVideo</dnameCn> -->
+					<!-- <dnameOu>Argus</dnameOu> -->
+					<!-- <dnameO>Argus</dnameO> -->
+					<!-- <dnameL>TianJin</dnameL> -->
+					<!-- <dnameSt>TianJin</dnameSt> -->
+					<!-- <dnameC>CN</dnameC> -->
+					<!-- <verify>true</verify> -->
+					<!-- <keystoreConfig> -->
+					<!-- <delete>false</delete> -->
+					<!-- <gen>false</gen> -->
+					<!-- </keystoreConfig> -->
+					<!-- </sign> -->
 					<pack200>false</pack200>
 					<gzip>true</gzip>
 					<outputJarVersions>false</outputJarVersions>

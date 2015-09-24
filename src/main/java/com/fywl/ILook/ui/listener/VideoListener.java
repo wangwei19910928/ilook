@@ -1,7 +1,6 @@
 package com.fywl.ILook.ui.listener;
 
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 
 import com.github.sarxos.webcam.WebcamEvent;

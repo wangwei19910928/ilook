@@ -29,7 +29,9 @@ public class RecordConfig {
 
 	private boolean faceRecording = false;
 
-	private boolean screenRecording = false;
+	private boolean screenRecording = true;
+	
+	private boolean noteRecording = false;
 
 	// Video time
 	private long videoLength = 300;
@@ -41,9 +43,27 @@ public class RecordConfig {
 	
 	//录制的尺寸
 	private Dimension videoSize;
+	//是否是单瓶录制
+	private boolean isSingleRecording;
+	//脸部摄像头
+	private boolean changeFace;
+	//笔记摄像头和屏幕互换
+	private boolean changeNote;
+	//脸部摄像头和笔记摄像头互换
+	private boolean changeScreen;
+	//有切换画面的动作
+	private boolean changeFlag = false;
 
-	public RecordConfig() {
+	private RecordConfig() {
 
+	}
+	
+	private static RecordConfig config;
+	public static RecordConfig get(){
+		if(null == config){
+			config = new RecordConfig();
+		}
+		return config;
 	}
 
 	public long getVideoLength() {
@@ -168,4 +188,54 @@ public class RecordConfig {
 	public void setVideoSize(Dimension videoSize) {
 		this.videoSize = videoSize;
 	}
+
+	public boolean isSingleRecording() {
+		return isSingleRecording;
+	}
+
+	public void setSingleRecording(boolean isSingleRecording) {
+		this.isSingleRecording = isSingleRecording;
+	}
+
+
+	public boolean isNoteRecording() {
+		return noteRecording;
+	}
+
+	public void setNoteRecording(boolean noteRecording) {
+		this.noteRecording = noteRecording;
+	}
+
+	public boolean isChangeFlag() {
+		return changeFlag;
+	}
+
+	public void setChangeFlag(boolean changeFlag) {
+		this.changeFlag = changeFlag;
+	}
+
+	public boolean isChangeFace() {
+		return changeFace;
+	}
+
+	public void setChangeFace(boolean changeFace) {
+		this.changeFace = changeFace;
+	}
+
+	public boolean isChangeNote() {
+		return changeNote;
+	}
+
+	public void setChangeNote(boolean changeNote) {
+		this.changeNote = changeNote;
+	}
+
+	public boolean isChangeScreen() {
+		return changeScreen;
+	}
+
+	public void setChangeScreen(boolean changeScreen) {
+		this.changeScreen = changeScreen;
+	}
+	
 }

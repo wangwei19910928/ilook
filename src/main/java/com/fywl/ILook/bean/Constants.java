@@ -12,6 +12,7 @@ public class Constants {
 		public int[] BACKGROUND = { 60, 131, 209 };
 		//网站主页
 		public String WEBSITE = "www.baidu.com";
+		public int[] DIMENSION ={1024, 768};
 	}
 
 	// 脸部摄像头
@@ -57,7 +58,7 @@ public class Constants {
 
 	// 屏幕大小
 	public interface SCREEN_Constant {
-		public int LOCATION_X = 166;
+		public int LOCATION_X = 170;
 
 		public int LOCATION_Y = 139;
 

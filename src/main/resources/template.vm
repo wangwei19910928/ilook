@@ -1,11 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp spec="1.0+" codebase="http://mv:8080/MicroVideo/" href="$outputFile">
+<jnlp spec="1.0+" codebase="http://localhost:8080/web/" href="$outputFile">
   <information>
     <title>MicroVideo</title>
     <vendor>Argus Software</vendor>
     <homepage>http://www.argussoftware.com</homepage>
-    <description>MicroVideo</description>
-    <icon href="http://mv:8080/MicroVideo/images/splash.jpeg" kind="splash"/>
+    <description>web</description>
 
     <offline-allowed/>
     <shortcut online="true">

@@ -4,9 +4,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
-import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
-import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Tray;
 import org.eclipse.swt.widgets.TrayItem;
 import org.eclipse.wb.swt.SWTResourceManager;
@@ -27,6 +25,8 @@ import com.fywl.ILook.ui.components.panel.impl.ToolPanel;
 import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.ImageUtil;
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.JIntellitype;
 
 public class FunctionMainWindow extends MainWindow implements Closer {
 
@@ -39,7 +39,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 	private VideoPlayBackPanel otherVideoPlayback;
 
 	private VideoRecorder recorder;
-
+	
 	private InfoBean ib;
 
 	// 出事最小化到系统托盘的监听
@@ -49,23 +49,24 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		super();
 	}
 
-	public FunctionMainWindow(InfoBean ib) {
+	public FunctionMainWindow(InfoBean ib,RecordConfig config) {
 		this();
 		this.ib = ib;
+		this.config = config;
 
 		init();
 	}
 
 	@Override
 	protected void beforeInit() {
-		config = new RecordConfig();
+//		config = new RecordConfig();
 		screenPlayBackPanel = new ScreenPlayBackPanel(shell, SWT.NO_BACKGROUND);
 
-		faceVideoPlayback = new VideoPlayBackPanel(shell, config, 0);
+		faceVideoPlayback = new VideoPlayBackPanel(shell,  0);
 
-		otherVideoPlayback = new VideoPlayBackPanel(shell, config, 1);
+		otherVideoPlayback = new VideoPlayBackPanel(shell,  1);
 
-		recorder = new VideoRecorder(screenPlayBackPanel, otherVideoPlayback,config);
+		recorder = new VideoRecorder(faceVideoPlayback,screenPlayBackPanel, otherVideoPlayback,config);
 
 		tray = display.getSystemTray();
 	}
@@ -92,14 +93,13 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 		initVideoPlayBackPanel();
 
-		initScreenPanel();
-
 		initOtherVideoPlayBackPanel();
+		
+		initScreenPanel();
 
 		initToolPanel();
 
 		initFootLabel();
-
 	}
 
 	@Override
@@ -149,14 +149,14 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		titlePanel.setSize(Constants.TITLE_PANEL_Constant.LOCATION[2],
 				Constants.TITLE_PANEL_Constant.LOCATION[3]);
 
-		MoveableListener listener = new MoveableListener(titlePanel.getParent());
-		MyLabel title = new MyLabel(titlePanel, SWT.NONE,
-				Constants.TITLE_PANEL_Constant.TITLE_CONTENT,
-				Constants.TITLE_PANEL_Constant.TITLE_LOCATION);
-		title.setForeground(SWTResourceManager
-				.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
-		title.addMouseListener(listener);
-		title.addMouseMoveListener(listener);
+//		MoveableListener listener = new MoveableListener(titlePanel.getParent());
+//		MyLabel title = new MyLabel(titlePanel, SWT.NONE,
+//				Constants.TITLE_PANEL_Constant.TITLE_CONTENT,
+//				Constants.TITLE_PANEL_Constant.TITLE_LOCATION);
+//		title.setForeground(SWTResourceManager
+//				.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
+//		title.addMouseListener(listener);
+//		title.addMouseMoveListener(listener);
 	}
 
 	// 初始化脸部摄像头
@@ -169,6 +169,8 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	// 初始化屏幕监控
 	private void initScreenPanel() {
+		screenPlayBackPanel.setFaceVideoPlayBackPanel(faceVideoPlayback);
+		screenPlayBackPanel.setOtherVideoPlayBackPanel(otherVideoPlayback);
 
 		screenPlayBackPanel.addImageRecorder(recorder);
 		screenPlayBackPanel.setSize(Constants.SCREEN_Constant.WIDTH,
@@ -213,23 +215,50 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 						Constants.INFO_LABEL_Constant.ICON_URL)));
 
 		new MyLabel(info, SWT.NONE, ib.getSchool(),
-				Constants.INFO_LABEL_Constant.SCHOOL);
+				Constants.INFO_LABEL_Constant.SCHOOL).setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		new MyLabel(info, SWT.NONE, ib.getName(),
-				Constants.INFO_LABEL_Constant.NAME);
+				Constants.INFO_LABEL_Constant.NAME).setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		new MyLabel(info, SWT.NONE, ib.getType(),
-				Constants.INFO_LABEL_Constant.TYPE);
+				Constants.INFO_LABEL_Constant.TYPE).setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		new MyLabel(info, SWT.NONE, "教龄： " + ib.getTrainAge() + "年",
-				Constants.INFO_LABEL_Constant.AGE);
+				Constants.INFO_LABEL_Constant.AGE).setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 
 	}
 
 	// 初始化监听切换摄像头
 	private void initChangeCam() {
-		display.addFilter(SWT.KeyDown, new Listener() {
+//		display.addFilter(SWT.KeyDown, new Listener() {
+//			@Override
+//			public void handleEvent(Event e) {
+//				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'a')) {
+//					recorder.changeSource();
+//				}
+//			}
+//		});
+		
+		//注册三个切换快捷键
+		JIntellitype.getInstance().registerHotKey(112, JIntellitype.MOD_CONTROL, 112);
+		JIntellitype.getInstance().registerHotKey(113, JIntellitype.MOD_CONTROL, 113);
+		JIntellitype.getInstance().registerHotKey(114, JIntellitype.MOD_CONTROL, 114);
+		//添加对应时间
+		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
 			@Override
-			public void handleEvent(Event e) {
-				if ((e.stateMask == SWT.CTRL) && (e.keyCode == 'a')) {
-					recorder.changeSource();
+			public void onHotKey(int arg0) {
+				switch (arg0) {
+				//录制脸部摄像头
+				case 112:
+					config.setChangeFace(true);
+					break;
+				//录制笔记摄像头
+				case 113:
+					config.setChangeNote(true);
+					break;
+				//录制桌面
+				case 114:
+					config.setChangeScreen(true);
+					break;
+				default:
+					break;
 				}
 			}
 		});
@@ -258,5 +287,4 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 				Constants.FOOT_LABEL_Constant.BACKGROUND[1],
 				Constants.FOOT_LABEL_Constant.BACKGROUND[2]));
 	}
-
 }

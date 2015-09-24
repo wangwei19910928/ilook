@@ -7,6 +7,7 @@ import java.util.Date;
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Combo;
@@ -15,18 +16,19 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Group;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.bean.UploadFileItem;
 import com.fywl.ILook.inter.Closer;
-import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.utils.HttpRequest;
+import com.fywl.ILook.utils.ImageUtil;
 
 public class UploadPanel extends Composite implements Closer {
 	private String videoName;
-
+	
 	public UploadPanel(Composite parent, int style, String videoName) {
 		super(parent, style);
 
@@ -43,32 +45,8 @@ public class UploadPanel extends Composite implements Closer {
 		this.setBounds(0, 0, Constants.Shell_Constant.WIDTH,
 				Constants.Shell_Constant.HEIGHT);
 
-		MoveableListener listener = new MoveableListener(this.getParent());
-		// 顶部标题
-		Composite title = new Composite(this, SWT.NONE);
-		title.setBackground(SWTResourceManager.getColor(
-				Constants.Shell_Constant.BACKGROUND[0],
-				Constants.Shell_Constant.BACKGROUND[1],
-				Constants.Shell_Constant.BACKGROUND[2]));
-		title.setBounds(0, 0, Constants.Shell_Constant.WIDTH, 30);
-		title.addMouseListener(listener);
-		title.addMouseMoveListener(listener);
-
-		// 标题文字
-		int location[] = { 0, 5, 80, 30 };
-		Label titleLabel = new MyLabel(title, SWT.NONE, "上传微课", location);
-		titleLabel.addMouseListener(listener);
-		titleLabel.addMouseMoveListener(listener);
-		// 关闭按钮
-		final ImageButton closeBtn = new ImageButton(title,
-				Constants.TITLE_PANEL_Constant.CLOSE_URL, "关闭");
-		closeBtn.getButton().setBounds(470, 0, 30, 30);
-		closeBtn.getButton().addListener(SWT.Selection, new Listener() {
-			@Override
-			public void handleEvent(Event event) {
-				closeBtn.parent.getParent().dispose();
-			}
-		});
+		// 顶部
+		new TitleComposite(this, SWT.NONE, "上传微课");
 
 		// 标题
 		int locationBT[] = { 20, 60, 40, 20 };
@@ -136,13 +114,19 @@ public class UploadPanel extends Composite implements Closer {
 		radio2.setSelection(true);
 
 		// 确定按钮
+		int location[] = { 0, 5, 80, 30 };
 		final Label confirmLabel = new MyLabel(this, SWT.NONE, "  确 定   ",
 				location);
+		Image confirmImage = ImageUtil.getInstance().getImage(
+				this.getDisplay(),
+				this.getClass().getResourceAsStream(
+						"/images/upload_confirm.png"));
+		confirmLabel.setImage(confirmImage);
 		confirmLabel.setBackground(SWTResourceManager.getColor(
 				Constants.Shell_Constant.BACKGROUND[0],
 				Constants.Shell_Constant.BACKGROUND[1],
 				Constants.Shell_Constant.BACKGROUND[2]));
-		confirmLabel.setBounds(250, 400, 80, 20);
+		confirmLabel.setBounds(250, 400, 80, 25);
 		confirmLabel.moveAbove(null);
 		confirmLabel.addListener(SWT.MouseUp, new Listener() {
 			@Override
@@ -155,22 +139,23 @@ public class UploadPanel extends Composite implements Closer {
 				String endTime = dateTime1.getText();
 				String bz = textBZ.getText();
 
-//				ArrayList<FormFieldKeyValuePair> ffkvp = new ArrayList<FormFieldKeyValuePair>();
-//				ffkvp.add(new FormFieldKeyValuePair("title", bt));
-//				ffkvp.add(new FormFieldKeyValuePair("tag", bq));
-//				ffkvp.add(new FormFieldKeyValuePair("key", a.toString()));
-//				ffkvp.add(new FormFieldKeyValuePair("type", km));
-//				ffkvp.add(new FormFieldKeyValuePair("flag", radio1
-//						.getSelection() ? true + "" : false + ""));
-//				ffkvp.add(new FormFieldKeyValuePair("beginTime", beginTime));
-//				ffkvp.add(new FormFieldKeyValuePair("endTime", endTime));
-//				ffkvp.add(new FormFieldKeyValuePair("info", bz));
+				// ArrayList<FormFieldKeyValuePair> ffkvp = new
+				// ArrayList<FormFieldKeyValuePair>();
+				// ffkvp.add(new FormFieldKeyValuePair("title", bt));
+				// ffkvp.add(new FormFieldKeyValuePair("tag", bq));
+				// ffkvp.add(new FormFieldKeyValuePair("key", a.toString()));
+				// ffkvp.add(new FormFieldKeyValuePair("type", km));
+				// ffkvp.add(new FormFieldKeyValuePair("flag", radio1
+				// .getSelection() ? true + "" : false + ""));
+				// ffkvp.add(new FormFieldKeyValuePair("beginTime", beginTime));
+				// ffkvp.add(new FormFieldKeyValuePair("endTime", endTime));
+				// ffkvp.add(new FormFieldKeyValuePair("info", bz));
 
 				ArrayList<UploadFileItem> ufi = new ArrayList<UploadFileItem>();
 				videoName = "E://ssdgdfg" + File.separator
-						+ "1441772929866test.mp4";
+						+ "test1-16gb.mp4";
 				ufi.add(new UploadFileItem("upload1", videoName));
-				String response="";
+				final String[] response = {""};
 				try {
 					// 上传状态 遮罩层
 					final Composite mp = new Composite(confirmLabel.getParent()
@@ -178,29 +163,49 @@ public class UploadPanel extends Composite implements Closer {
 					mp.setBounds(0, 0, 500, 440);
 					mp.moveAbove(null);
 					// 展现层
-					Composite mp1 = new EmptyPanel(mp, SWT.NONE, "正在上传");
-//					// 进度条
-//					ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
-//					pb.setBounds(100, 110, 100, 20);
+					final Composite mp1 = new EmptyPanel(mp, SWT.NONE, "正在上传");
+					// // 进度条
+					// ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
+					// pb.setBounds(100, 110, 100, 20);
 
-//					// 请求服务器
-					response = HttpRequest.uploadFile(
-							Constants.UPLOAD_Constant.HTTP_UPLOAD_URL,
-							videoName);
+					// // 请求服务器
+					new Thread(new Runnable() {
+						@Override
+						public void run() {
+							getDisplay().asyncExec(new Runnable() {
+								@Override
+								public void run() {
+									// TODO Auto-generated method stub
+									// 进度条
+									ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
+									pb.setBounds(100, 50, 100, 20);
+									pb.moveAbove(null);
+								}
+							});
+							response[0] = HttpRequest.uploadFile(
+									Constants.UPLOAD_Constant.HTTP_UPLOAD_URL,
+									videoName);
+							getDisplay().asyncExec(new Runnable() {
+								public void run() {
+									// 销毁展现层
+									mp1.dispose();
+									if (response[0].contains("O")) {
+										// 上传成功提示框
+										new EmptyPanel(mp, SWT.NONE, "上传成功", "  关 闭 ",
+												confirmLabel.getParent());
+									} else {
+										// 上传失败提示框
+										new EmptyPanel(mp, SWT.NONE, "上传失败", "  关 闭 ", null);
+									}
+								}
+							});
+						}
+							
+					}).start();
 					// response = HttpRequest.sendHttpPostRequest(
 					// Constants.UPLOAD_Constant.HTTP_UPLOAD_URL, ffkvp,
 					// ufi);
 					System.out.println("Responsefrom server is: " + response);
-					// 销毁展现层
-					mp1.dispose();
-					if (response.contains("O")) {
-						// 上传成功提示框
-						new EmptyPanel(mp, SWT.NONE, "上传成功", "  关 闭 ",
-								confirmLabel.getParent());
-					} else {
-						// 上传失败提示框
-						new EmptyPanel(mp, SWT.NONE, "上传失败", "  关 闭 ", null);
-					}
 				} catch (Exception e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -211,7 +216,12 @@ public class UploadPanel extends Composite implements Closer {
 		// 取消按钮
 		final Label cancelLabel = new MyLabel(this, SWT.NONE, "  取 消    ",
 				location);
-		cancelLabel.setBounds(350, 400, 80, 20);
+		Image giveupImage = ImageUtil.getInstance().getImage(
+				this.getDisplay(),
+				this.getClass().getResourceAsStream(
+						"/images/upload_giveup.png"));
+		cancelLabel.setImage(giveupImage);
+		cancelLabel.setBounds(350, 400, 80, 25);
 		cancelLabel.setBackground(SWTResourceManager.getColor(
 				Constants.Shell_Constant.BACKGROUND[0],
 				Constants.Shell_Constant.BACKGROUND[1],

@@ -1,5 +1,7 @@
 package com.fywl.ILook.ui.mw.impl;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -7,6 +9,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.graphics.Image;
@@ -22,6 +26,7 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.bean.InfoBean;
+import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.FootLabel;
 import com.fywl.ILook.ui.components.InfoLaber;
@@ -152,11 +157,11 @@ public class LoginMainWindow extends MainWindow implements Closer {
 		info.setBackgroundImage(infoImage);
 		info.setBackgroundMode(SWT.INHERIT_DEFAULT);
 
-		Label l = new MyLabel(info, SWT.NONE,
-				Constants.LOGIN_HEAD_Constant.CONTENT,
-				Constants.LOGIN_HEAD_Constant.LOCATION);
-		l.setFont(SWTResourceManager.getFont(".Helvetica Neue DeskInterface",
-				22, SWT.BOLD));
+//		Label l = new MyLabel(info, SWT.NONE,
+//				Constants.LOGIN_HEAD_Constant.CONTENT,
+//				Constants.LOGIN_HEAD_Constant.LOCATION);
+//		l.setFont(SWTResourceManager.getFont(".Helvetica Neue DeskInterface",
+//				22, SWT.BOLD));
 	}
 
 	// 初始化底部信息
@@ -217,7 +222,24 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				Constants.LOGIN_HEAD_Constant.PASSWORD_LOCATION[1],
 				Constants.LOGIN_HEAD_Constant.PASSWORD_LOCATION[2],
 				Constants.LOGIN_HEAD_Constant.PASSWORD_LOCATION[3]);
+		text_1.addKeyListener(new KeyListener() {
+			@Override
+			public void keyReleased(KeyEvent e) {
+				// TODO Auto-generated method stub
 
+			}
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (13 == e.keyCode || 16777296 == e.keyCode) {
+					Event e1 = new Event();
+					e1.widget = loginButton;
+					// 主动触发button点击事件
+					loginButton.notifyListeners(SWT.MouseUp, e1);
+				}
+			}
+		});
+		
 		button = new Button(cp, SWT.CHECK);
 		button.setFont(SWTResourceManager.getFont(
 				".Helvetica Neue DeskInterface", 10, SWT.NORMAL));
@@ -316,7 +338,25 @@ public class LoginMainWindow extends MainWindow implements Closer {
 							e.printStackTrace();
 						}
 					}
-					new FunctionMainWindow(ib);
+
+					RecordConfig rc = RecordConfig.get();
+					rc.setSingleRecording(false);
+					rc.setVideoSize(new Dimension(
+							Constants.Shell_Constant.DIMENSION[0],
+							Constants.Shell_Constant.DIMENSION[1]));
+					// 是否是单瓶录制
+					String isSingleRecording = properties
+							.getProperty("dplzFlag");
+					if (null != isSingleRecording
+							&& isSingleRecording.contains("true")) {
+						// 获取屏幕分辨率
+						Dimension d = Toolkit.getDefaultToolkit()
+								.getScreenSize();
+						rc.setSingleRecording(true);
+						rc.setVideoSize(d);
+					}
+
+					new FunctionMainWindow(ib, rc);
 				} else {
 					// cp1.setVisible(false);
 					messageLabel.setVisible(true);

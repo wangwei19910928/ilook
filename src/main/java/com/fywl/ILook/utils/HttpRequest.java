@@ -285,6 +285,7 @@ public class HttpRequest {
 
 	/* 上传文件至Server的方法 */
 	public static String uploadFile(String actionUrl, String uploadFile) {
+		long begin = System.currentTimeMillis();
 		String end = "\r\n";
 		String twoHyphens = "--";
 		String boundary = "*****";
@@ -300,6 +301,9 @@ public class HttpRequest {
 			con.setDoInput(true);
 			con.setDoOutput(true);
 			con.setUseCaches(false);
+//			con.setFixedLengthStreamingMode(1024);
+			con.setChunkedStreamingMode(1024*1024*50);
+			con.setConnectTimeout(1000*10*100);
 			/* 设置传送的method=POST */
 			con.setRequestMethod("POST");
 			/* setRequestProperty */
@@ -317,18 +321,18 @@ public class HttpRequest {
 			FileInputStream fStream = new FileInputStream(uploadFile);
 			/* 设置每次写入1024bytes */
 			int bufferSize = 1024;
-			byte[] buffer = new byte[bufferSize];
+			byte[] buffer = new byte[bufferSize*1024*50];
 			int length = -1;
 			/* 从文件读取数据至缓冲区 */
 			while ((length = fStream.read(buffer)) != -1) {
 				/* 将资料写入DataOutputStream中 */
 				ds.write(buffer, 0, length);
+//				ds.flush();
 			}
 			ds.writeBytes(end);
 			ds.writeBytes(twoHyphens + boundary + twoHyphens + end);
 			/* close streams */
 			fStream.close();
-			ds.flush();
 			/* 取得Response内容 */
 //			String strLine = "";
 //			String strResponse = "";
@@ -353,6 +357,8 @@ public class HttpRequest {
 			System.out.println("上传成功" + new String(b));
 			/* 关闭DataOutputStream */
 			ds.close();
+			long end1 = System.currentTimeMillis();
+			System.out.println(end1-begin);
 			return  new String(b);
 		} catch (Exception e) {
 			System.out.println("上传失败" + e);

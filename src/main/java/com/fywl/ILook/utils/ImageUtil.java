@@ -3,6 +3,7 @@ package com.fywl.ILook.utils;
 import java.awt.AWTException;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.GraphicsEnvironment;
 import java.awt.Rectangle;
 import java.awt.Robot;
 import java.awt.Toolkit;
@@ -40,18 +41,25 @@ import com.sun.jna.platform.win32.WinUser.WNDENUMPROC;
 public class ImageUtil {
 	
 	private static final String TASK_BAR = "Shell_TrayWnd";
+	
+	private static final String DEST_NAME = "Program Manager";
 
 	private static final User32Extra user32 = User32Extra.INSTANCE;
 
 	private static final ImageUtil util = new ImageUtil();
 
 	private Dimension size = Toolkit.getDefaultToolkit().getScreenSize();
+	
+	private int viewHeight = 0;
 
 	private Robot robot;
 
 	private ImageUtil() {
 		try {
 			robot = new Robot();
+			GraphicsEnvironment graphicsEnvironment=GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+			Rectangle maximumWindowBounds=graphicsEnvironment.getMaximumWindowBounds();
+			viewHeight = maximumWindowBounds.height;
 		} catch (AWTException e) {
 			;
 		}
@@ -95,10 +103,11 @@ public class ImageUtil {
 		return null;
 	}
 
-	//单独存放桌面  否则会造成stack错乱（已发现的输入法会比桌面后入stack）
-	ScreenImage deskTopImage;
 	public BufferedImage screenCapture() {
+		//单独存放桌面  否则会造成stack错乱（已发现的输入法会比桌面后入stack）
+//		final ScreenImage deskTopImage = null;
 
+		final Stack<ScreenImage> deskTopImageStack = new Stack<>();
 		final Stack<ScreenImage> images = new Stack<>();
 
 		user32.EnumWindows(new WNDENUMPROC() {
@@ -111,9 +120,9 @@ public class ImageUtil {
 					user32.GetClassName(hWnd, lpClassName, 512);
 					String className = Native.toString(lpClassName);
 					String wText = Native.toString(windowText, "GBK");
-					// if (wText.isEmpty() || "开始".equals(wText)) {
-					// return true;
-					// }
+//					 if (wText.isEmpty() || "开始".equals(wText)) {
+//					 return true;
+//					 }
 					 if (wText.isEmpty() && !TASK_BAR.equals(className)) {
 					 return true;
 					 }
@@ -130,14 +139,15 @@ public class ImageUtil {
 								|| TASK_BAR.equals(className)) {
 							flag = true;
 						}
-						// BufferedImage screen = capture(hWnd);
+//						 BufferedImage screen = capture(hWnd);
 						BufferedImage screen = capture(hWnd, flag);
 						if (screen != null) {
 							ScreenImage image = new ScreenImage(screen, rect);
-							if("Program Manager".equals(wText))
-								deskTopImage = image;
-							else
+							if("Program Manager".equals(wText)){
+								deskTopImageStack.push(image);
+							}else{
 								images.push(image);
+							}
 						}
 					}
 				}
@@ -147,6 +157,7 @@ public class ImageUtil {
 
 		if (!images.isEmpty()) {
 //			ScreenImage deskTopImage = images.pop();
+			ScreenImage deskTopImage = deskTopImageStack.pop();
 			BufferedImage combined = new BufferedImage(
 					deskTopImage.getRect().width,
 					deskTopImage.getRect().height, BufferedImage.TYPE_3BYTE_BGR);
@@ -225,13 +236,16 @@ public class ImageUtil {
 
 		int width = bounds.right - bounds.left;
 		int height = bounds.bottom - bounds.top;
+		
 		/*
 		 * 宽度不存在的直接返回
 		 */
 		if (0 == width && 0 == height) {
 			return null;
 		}
-
+		if(height>viewHeight && height<size.height){
+			height = viewHeight;
+		}
 		HBITMAP hBitmap = GDI32.INSTANCE.CreateCompatibleBitmap(hdcWindow,
 				width, height);
 
@@ -253,14 +267,16 @@ public class ImageUtil {
 		GDI32.INSTANCE.GetDIBits(hdcWindow, hBitmap, 0, height, buffer, bmi,
 				WinGDI.DIB_RGB_COLORS);
 
-		BufferedImage image = new BufferedImage(width, height,
-				BufferedImage.TYPE_INT_RGB);
+		BufferedImage image = null;
 		/*
 		 * 根据flag画出透明图像
 		 */
 		if (flag) {
 			image = new BufferedImage(width, height,
 					BufferedImage.TYPE_INT_ARGB);
+		}else{
+			image = new BufferedImage(width, height,
+					BufferedImage.TYPE_INT_RGB);
 		}
 
 		image.setRGB(0, 0, width, height,
@@ -286,6 +302,17 @@ public class ImageUtil {
 			;
 		}
 		return null;
+	}
+	
+	/**
+	 * 每次录制的时候有可能会切换分辨率
+	 * 此方法，用于设置size和从新height
+	 */
+	public void initSizeAndHeight(){
+		size = Toolkit.getDefaultToolkit().getScreenSize();
+		GraphicsEnvironment graphicsEnvironment=GraphicsEnvironment.getLocalGraphicsEnvironment(); 
+		Rectangle maximumWindowBounds=graphicsEnvironment.getMaximumWindowBounds();
+		viewHeight = maximumWindowBounds.height;
 	}
 
 	/**
