@@ -1,7 +1,10 @@
 package com.fywl.ILook.ui.components;
 
+import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Composite;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
@@ -16,6 +19,7 @@ import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
+import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
 import javax.sound.sampled.AudioSystem;
 import javax.sound.sampled.DataLine;
@@ -157,6 +161,8 @@ class MediaReader implements Runnable {
 	private boolean record = true;
 	// 记录暂停状态
 	private boolean pauseFlag = true;
+	
+	private Image img;
 
 	// // 记录切换按钮
 	// private Integer changeCount = 1;
@@ -211,7 +217,20 @@ class MediaReader implements Runnable {
 		initParam();
 		executor.submit(this);
 
-
+		File file = new File("user.properties");
+		FileInputStream fis;
+		try {
+			if (file.exists()) {
+				properties = new Properties();
+				fis = new FileInputStream(file);
+				properties.load(fis);
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
 		return g;
 	}
 
@@ -339,11 +358,39 @@ class MediaReader implements Runnable {
 					infoArr[0] = infoStr;
 				}
 			}
+			
+			String[] water = {"","我的水印","10","255","3"};//图片路劲，文字，大小，颜色，位置
+			String waterImg = properties.getProperty("water_img");
+			if(null != waterImg && !"".equals(waterImg)){
+				water[0] = waterImg;
+//				img = ImageUtil.getInstance().getBufferedImage(
+//						waterImg);
+				img = ImageIO.read(new File(waterImg));
+			}
+			String waterText = properties.getProperty("water_text");
+			if(null != waterText && !"".equals(waterText)){
+				water[1] = waterText;
+			}
+			String water_text_size = properties.getProperty("water_text_size");
+			if(null != water_text_size && !"".equals(water_text_size)){
+				water[2] = water_text_size;
+			}
+			String water_text_color = properties.getProperty("water_text_color");
+			if(null != water_text_color && !"".equals(water_text_color)){
+				water[3] = water_text_color;
+			}
+			String water_location = properties.getProperty("water_location");
+			if(null != water_location && !"".equals(water_location)){
+				water[4] = water_location;
+			}
 //			changeVideo();
 //			customAudioVideoStream();
+			String framerate = properties.getProperty("frameRate");
+			System.out.println(framerate);
+			int frameCount = (null == framerate || "".equals(framerate) ? 50000 : Integer.parseInt(framerate));
 			while (record) {
 				while (pauseFlag) {
-					createVideo(writer, audioBuf, format, line,biy,themeArr,teacherArr,schoolArr,infoArr);
+					createVideo(writer, audioBuf, format, line,biy,themeArr,teacherArr,schoolArr,infoArr,water,img,frameCount);
 					// 录制中直接结束 跳出循环
 					if (!record) {
 						break;
@@ -367,7 +414,7 @@ class MediaReader implements Runnable {
 	}
 
 	private void createVideo(IMediaWriter writer, byte[] audioBuf,
-			AudioFormat format, TargetDataLine line, Image biy,String[] themeArr,String[] teacherArr,String[] schoolArr,String[] infoArr) {
+			AudioFormat format, TargetDataLine line, Image biy,String[] themeArr,String[] teacherArr,String[] schoolArr,String[] infoArr,String[] water,Image img,int frameCount) {
 		changeVideo();
 
 		if (!config.isSingleRecording()) {
@@ -385,6 +432,15 @@ class MediaReader implements Runnable {
 				g.drawString(infoArr[0], 80, 450);
 				g.drawString(infoArr[1], 80, 475);
 		}
+		//画水印
+//		Graphics2D g2 = (Graphics2D) g;
+//		g2.rotate(Math.toRadians(-45),(double) combined.getWidth() / 2, (double) combined.getHeight() / 2);
+//		Image img = ImageUtil.getInstance().getBufferedImage(
+//				"images/logo3.png");
+//		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,1f));
+//		g2.drawImage(img, 30, 600,null);
+//		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
+		
 		IConverter converter = ConverterFactory.createConverter(combined,
 				IPixelFormat.Type.YUV420P);
 		IVideoPicture frame = converter.toPicture(combined,
@@ -401,14 +457,17 @@ class MediaReader implements Runnable {
 		smp.put(audioBuf, 0, 0, nBytesRead);
 		smp.setComplete(true, numSample, (int) format.getSampleRate(), 1,
 				IAudioSamples.Format.FMT_S16, line.getMicrosecondPosition());
-//		while(t1<line.getMicrosecondPosition()){
-//			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
-//			t1 += 50000;
-//			System.out.println(combined.toString());
-//		}
+		while(t1<line.getMicrosecondPosition()){
+			if(null != g){
+//				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
+				drawWater(g, water, img);
+			}
+			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
+			t1 += frameCount;
+		}
 //		t1 += 15000;
 //		t1 += 45000;
-		writer.encodeVideo(0, frame);
+//		writer.encodeVideo(0, frame);
 		writer.encodeAudio(1, smp);
 	}
 
@@ -428,7 +487,7 @@ class MediaReader implements Runnable {
 	// }
 
 	// 实现画面的切
-	private void changeVideo() {
+	void changeVideo() {
 		if (config.isChangeFlag()) {
 			// 单瓶切换
 			if (config.isSingleRecording()) {
@@ -467,7 +526,7 @@ class MediaReader implements Runnable {
 	}
 
 	// 初始化状态参数
-	private void initParam() {
+	void initParam() {
 		// faceVideo = new VideoListener(g, 0, 210, 240, 180);
 		otherVideo = new VideoListener(g, 0, 210, 240, 180);
 		singleScreenVideo = new VideoListener(g, 0, 0,
@@ -480,12 +539,88 @@ class MediaReader implements Runnable {
 		pauseFlag = true;
 		// 初始化时间
 		i = 0;
+		t1 = 0;
 		config.setChangeFlag(true);
 	}
 
 	int getTime() {
 		return i;
 	}
+	
+	
+	private void drawWater(Graphics g,String[] water,Image img){
+		if(null != g){
+//			Graphics2D g2 = (Graphics2D) g;
+//			Composite composite =  g2.getComposite();
+			//判断图片
+			if(null != img){
+				BufferedImage bi = (BufferedImage) img;
+				int w=0,h=0;
+				switch (Integer.parseInt(water[4])) {
+				case 2:
+					w = videoSize.width-bi.getWidth();
+					h = 0;
+					break;
+				case 3:
+					w = videoSize.width - bi.getWidth();
+					h = videoSize.height - bi.getHeight();
+					break;
+				case 4:
+					w = 0;
+					h = videoSize.height - bi.getHeight();
+					break;
+				default:
+					break;
+				}
+//				g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP, 0.1f));
+				g.drawImage(img, w,h, new Color(255,255,0,0), null);
+//				g2.setComposite(composite);
+			}
+			Font f = g.getFont();
+			Color c = g.getColor();
+			//文字
+			if(!water[1].isEmpty()){
+				Font font1=new Font("宋体",Font.BOLD,Integer.parseInt(water[2]));
+				g.setFont(font1);
+				Color cl = new Color(256);
+				g.setColor(cl);
+				int w=0,h=Integer.parseInt(water[2]);
+				switch (Integer.parseInt(water[4])) {
+				case 2:
+					w = videoSize.width-Integer.parseInt(water[2])*(water[1].length())-10;
+					break;
+				case 3:
+					w = videoSize.width - Integer.parseInt(water[2])*(water[1].length())-10;
+					h = videoSize.height;
+					break;
+				case 4:
+					w = 0;
+					h = videoSize.height;
+					break;
+				default:
+					break;
+				}
+				g.drawString(water[1], w, h);
+			}
+			
+			g.setColor(c);
+			g.setFont(f);
+		}
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	
 	
 	
 	

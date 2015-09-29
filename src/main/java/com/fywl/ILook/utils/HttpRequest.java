@@ -1,22 +1,16 @@
 package com.fywl.ILook.utils;
 
 import java.io.BufferedReader;
-import java.io.DataInputStream;
 import java.io.DataOutputStream;
-import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
-import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-
-import com.fywl.ILook.bean.FormFieldKeyValuePair;
-import com.fywl.ILook.bean.UploadFileItem;
+import java.util.Map;
 
 public class HttpRequest {
 	/**
@@ -125,173 +119,15 @@ public class HttpRequest {
 		return result;
 	}
 
-	// 每个post参数之间的分隔。随意设定，只要不会和其他的字符串重复即可。
-	private static final String BOUNDARY = "----------HV2ymHFg03ehbqgZCaKO6jyH";
-
-	public static String sendHttpPostRequest(String serverUrl,
-			ArrayList<FormFieldKeyValuePair> generalFormFields,
-			ArrayList<UploadFileItem> filesToBeUploaded) throws Exception {
-		// 向服务器发送post请求
-		URL url = new URL(serverUrl/* "http://127.0.0.1:8080/test/upload" */);
-		HttpURLConnection connection = (HttpURLConnection) url.openConnection();
-
-		// 发送POST请求必须设置如下两行
-		connection.setDoOutput(true);
-		connection.setDoInput(true);
-		connection.setUseCaches(false);
-		connection.setRequestMethod("POST");
-		connection.setRequestProperty("Connection", "Keep-Alive");
-		connection.setRequestProperty("Charset", "UTF-8");
-		connection.setRequestProperty("Content-Type",
-				"multipart/form-data; boundary=" + BOUNDARY);
-
-		// 头
-		String boundary = BOUNDARY;
-		// 传输内容
-		StringBuffer contentBody = new StringBuffer("--" + BOUNDARY);
-		// 尾
-		String endBoundary = "\r\n--" + boundary + "--\r\n";
-
-		OutputStream out = connection.getOutputStream();
-
-		// 1. 处理普通表单域(即形如key = value对)的POST请求
-		for (FormFieldKeyValuePair ffkvp : generalFormFields) {
-			contentBody.append("\r\n")
-					.append("Content-Disposition: form-data; name=\"")
-					.append(ffkvp.getKey() + "\"").append("\r\n")
-					.append("\r\n").append(ffkvp.getValue()).append("\r\n")
-					.append("--").append(boundary);
-		}
-		String boundaryMessage1 = contentBody.toString();
-		out.write(boundaryMessage1.getBytes("utf-8"));
-
-		// 2. 处理文件上传
-		for (UploadFileItem ufi : filesToBeUploaded) {
-			contentBody = new StringBuffer();
-			contentBody
-					.append("\r\n")
-					.append("Content-Disposition:form-data; name=\"")
-					.append(ufi.getFormFieldName() + "\"; ")
-					// form中field的名称
-					.append("filename=\"")
-					.append(ufi.getFileName() + "\"")
-					// 上传文件的文件名，包括目录
-					.append("\r\n")
-					.append("Content-Type:application/octet-stream")
-					.append("\r\n\r\n");
-
-			String boundaryMessage2 = contentBody.toString();
-			out.write(boundaryMessage2.getBytes("utf-8"));
-
-			// 开始真正向服务器写文件
-			File file = new File(ufi.getFileName());
-			DataInputStream dis = new DataInputStream(new FileInputStream(file));
-			int bytes = 0;
-			byte[] bufferOut = new byte[(int) file.length()];
-			bytes = dis.read(bufferOut);
-			out.write(bufferOut, 0, bytes);
-			dis.close();
-
-			// contentBody.append("------------HV2ymHFg03ehbqgZCaKO6jyH");
-			//
-			// String boundaryMessage = contentBody.toString();
-			// out.write(boundaryMessage.getBytes("utf-8"));
-			// System.out.println(boundaryMessage);
-			out.write("------------HV2ymHFg03ehbqgZCaKO6jyH--\r\n"
-					.getBytes("UTF-8"));
-		}
-		out.write("------------HV2ymHFg03ehbqgZCaKO6jyH--\r\n"
-				.getBytes("UTF-8"));
-
-		// 3. 写结尾
-		out.write(endBoundary.getBytes("utf-8"));
-		out.flush();
-		out.close();
-
-		// 4. 从服务器获得回答的内容
-		String strLine = "";
-		String strResponse = "";
-
-		InputStream in = connection.getInputStream();
-		BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-		while ((strLine = reader.readLine()) != null) {
-			strResponse += strLine + "\n";
-		}
-		// System.out.print(strResponse);
-
-		return strResponse;
-	}
-
-	// public static void upload(String serverUrl) {
-	// try {
-	// URL url = new URL("serverUrl"); // 文件接收的CGI,不一定是JSP的
-	//
-	// HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-	// conn.setRequestMethod("POST");
-	// conn.setDoOutput(true);
-	//
-	// String BOUNDARY = "---------------------------7d4a6d158c9"; // 分隔符
-	//
-	// StringBuffer sb = new StringBuffer();
-	// sb.append("--");
-	// sb.append(BOUNDARY);
-	// sb.append("\r\n");
-	// sb.append("Content-Disposition: form-data; name=\"myfile\"; filename=\"test.txt\"\r\n");
-	// sb.append("Content-Type: application/octet-stream\r\n\r\n");
-	//
-	// byte[] data = sb.toString().getBytes();
-	// byte[] end_data = ("\r\n--" + BOUNDARY + "--\r\n").getBytes();
-	//
-	// conn.setRequestProperty("Content-Type",
-	// "multipart/form-data; boundary=" + BOUNDARY); // 设置表单类型和分隔符
-	// conn.setRequestProperty("Content-Length",
-	// String.valueOf(data.length + buf.length + end_data.length)); // 设置内容长度
-	//
-	// os = conn.getOutputStream();
-	// os.write(data);
-	//
-	// FileInputStream fis = new FileInputStream(new File(
-	// "E:/badboy/test.txt")); // 要上传的文件
-	//
-	// int rn2;
-	// byte[] buf2 = new byte[1024];
-	// while ((rn2 = fis.read(buf2, 0, 1024)) > 0) {
-	// os.write(buf2, 0, rn2);
-	//
-	// }
-	//
-	// os.write(end_data);
-	// os.flush();
-	// os.close();
-	// fis.close();
-	//
-	// // 得到返回的信息
-	// InputStream is = conn.getInputStream();
-	//
-	// byte[] inbuf = new byte[1024];
-	// int rn;
-	// while ((rn = is.read(inbuf, 0, 1024)) > 0) {
-	//
-	// System.out.write(inbuf, 0, rn);
-	//
-	// }
-	// is.close();
-	//
-	// } catch (Exception ee) {
-	// System.out.println("上传出错.");
-	// }
-	//
-	// }
-
 	/* 上传文件至Server的方法 */
-	public static String uploadFile(String actionUrl, String uploadFile) {
+	public static String uploadFile(String actionUrl, String uploadFile,Map<String, String> params) {
 		long begin = System.currentTimeMillis();
 		String end = "\r\n";
 		String twoHyphens = "--";
 		String boundary = "*****";
-		String newName = "123.mp4";
-		// String uploadFile = "storage/sdcard1/bagPictures/102.jpg";
-		;
+		String newName = System.currentTimeMillis()+"vk.mp4";
+		String CHARSET = "UTF-8";
+		
 		// String actionUrl =
 		// "http://192.168.1.123:8080/upload/servlet/UploadServlet";
 		try {
@@ -311,11 +147,29 @@ public class HttpRequest {
 			con.setRequestProperty("Charset", "UTF-8");
 			con.setRequestProperty("Content-Type",
 					"multipart/form-data;boundary=" + boundary);
+			
+			// 首先组拼文本类型的参数
+	        StringBuilder sb = new StringBuilder();
+	        for (Map.Entry<String, String> entry : params.entrySet())
+	        {
+	            sb.append(twoHyphens);
+	            sb.append(boundary);
+	            sb.append(end);
+	            sb.append("Content-Disposition: form-data; name=\"" + entry.getKey() + "\"" + end);
+	            sb.append("Content-Type: text/plain; charset=" + CHARSET + end);
+	            sb.append("Content-Transfer-Encoding: 8bit" + end);
+	            sb.append(end);
+	            sb.append(entry.getValue());
+	            sb.append(end);
+	        }
+	        DataOutputStream outStream = new DataOutputStream(con.getOutputStream());
+	        outStream.write(sb.toString().getBytes());
+			
 			/* 设置DataOutputStream */
 			DataOutputStream ds = new DataOutputStream(con.getOutputStream());
 			ds.writeBytes(twoHyphens + boundary + end);
 			ds.writeBytes("Content-Disposition: form-data; "
-					+ "name=\"file1\";filename=\"" + newName + "\"" + end);
+					+ "name=\"file\";filename=\"" + newName + "\"" + end);
 			ds.writeBytes(end);
 			/* 取得文件的FileInputStream */
 			FileInputStream fStream = new FileInputStream(uploadFile);
@@ -334,35 +188,21 @@ public class HttpRequest {
 			/* close streams */
 			fStream.close();
 			/* 取得Response内容 */
-//			String strLine = "";
-//			String strResponse = "";
-//
-//			InputStream in = con.getInputStream();
-//			BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-//			while ((strLine = reader.readLine()) != null) {
-//				strResponse += strLine + "\n";
-//			}
 			InputStream is = con.getInputStream();
 			int ch;
 			byte[] b = new byte[1024];
-			// while ((ch = is.read()) != -1) {
-			// b.append((char) ch);
-			// }
 			while ((ch = is.read(b, 0, 1024)) > 0) {
 				System.out.println(111);
 				System.out.write(b, 0, ch);
 
 			}
-			/* 将Response显示于Dialog */
-			System.out.println("上传成功" + new String(b));
 			/* 关闭DataOutputStream */
 			ds.close();
 			long end1 = System.currentTimeMillis();
 			System.out.println(end1-begin);
 			return  new String(b);
 		} catch (Exception e) {
-			System.out.println("上传失败" + e);
 			return "error";
 		}
-	}
+	}	
 }

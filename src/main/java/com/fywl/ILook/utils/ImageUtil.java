@@ -155,7 +155,7 @@ public class ImageUtil {
 			}
 		}, null);
 
-		if (!images.isEmpty()) {
+		if (!deskTopImageStack.isEmpty() && !images.isEmpty()) {
 //			ScreenImage deskTopImage = images.pop();
 			ScreenImage deskTopImage = deskTopImageStack.pop();
 			BufferedImage combined = new BufferedImage(

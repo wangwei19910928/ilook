@@ -129,7 +129,7 @@ public class ToolPanel extends Panel {
 					zz.moveAbove(null);
 					final MessagePanel mp = new MessagePanel(zz, SWT.NONE);
 					mp.moveAbove(null);
-					mp.setBounds(100, 100, 350, 290);
+					mp.setBounds(100, 70, 350, 290);
 					//右侧的上传按钮
 					int[] location = { 0, 0, 0, 0 };
 					Label label = new MyLabel(mp, SWT.NONE, "", location);

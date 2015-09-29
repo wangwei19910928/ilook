@@ -13,9 +13,11 @@ import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.layout.FillLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Combo;
 import org.eclipse.swt.widgets.Composite;
 import org.eclipse.swt.widgets.DirectoryDialog;
 import org.eclipse.swt.widgets.Event;
+import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 import org.eclipse.swt.widgets.Text;
@@ -69,8 +71,10 @@ public class SetupPanel extends Composite implements Closer {
 		ctf.setBounds(0, 30, Constants.Shell_Constant.WIDTH, 350);
 		ctf.setLayout(new FillLayout());
 		
-		Rectangle cpLocation = new Rectangle(0, 30, 400, 400);
-		
+		Rectangle cpLocation = new Rectangle(0, 30, 500, 400);
+		/*
+		 * 常规设置
+		 */
 		CTabItem ctb1 = new CTabItem(ctf, SWT.NONE);
 		ctb1.setText("   常规      ");
 		
@@ -82,18 +86,37 @@ public class SetupPanel extends Composite implements Closer {
 		//录制方式
 		final Button dplz = new Button(setupCP, SWT.CHECK);
 		dplz.setText("单屏录制");
-		dplz.setBounds(100, 50, 80, 30);
+		dplz.setFont(SWTResourceManager.getFont(".Helvetica Neue DeskInterface", 12, SWT.BOLD));
+		dplz.setBounds(100, 50, 100, 30);
 		String dplzFlag = properties.getProperty("dplzFlag");
 		if("true".equals(dplzFlag)){
 			dplz.setSelection(true);
 		}
+		//帧率
+		int[] zllocation = {100,90,80,30};
+		new MyLabel(setupCP, SWT.NONE, "帧率", zllocation);
+		
+		final Combo zlcombo = new Combo(setupCP, SWT.READ_ONLY);
+		zlcombo.setBounds(200, 90, 80, 30);
+		zlcombo.setItems(Constants.SETUP_Constant.frame_rate);
+		String frameRate = properties.getProperty("frameRate");
+		for (int i = 0; i < Constants.SETUP_Constant.frame_rate.length; i++) {
+			if(Constants.SETUP_Constant.frame_rate_value[i].equals(frameRate)){
+				zlcombo.setText(frameRate);
+				zlcombo.select(i);
+			}
+			zlcombo.setData(Constants.SETUP_Constant.frame_rate[i],
+					Constants.SETUP_Constant.frame_rate_value[i]);
+		}
 		// 存储
-		Label mr = new Label(setupCP, SWT.CHECK);
-		mr.setText("存储");
-		mr.setBounds(100, 90, 30, 30);
+		int[] cunchulocation = {100, 130, 40, 30};
+		new MyLabel(setupCP, SWT.NONE, "存储", cunchulocation);
+//		Label mr = new Label(setupCP, SWT.CHECK);
+//		mr.setText("存储");
+//		mr.setBounds(100, 90, 30, 30);
 
 		final Text cunchu = new Text(setupCP, SWT.BORDER);
-		cunchu.setBounds(190, 90, 200, 20);
+		cunchu.setBounds(190, 130, 200, 20);
 		cunchu.setEditable(false);
 		String videoPath = properties.getProperty("videoPath");
 		if(null != videoPath && !"".equals(videoPath)){
@@ -108,7 +131,7 @@ public class SetupPanel extends Composite implements Closer {
 				this.getClass().getResourceAsStream(
 						"/images/setup_change.png"));
 		ggml.setImage(changeImage);
-		ggml.setBounds(150, 130, 100, 25);
+		ggml.setBounds(150, 170, 100, 25);
 		ggml.setBackground(SWTResourceManager.getColor(244, 253, 209));
 
 		ggml.addListener(SWT.MouseUp, new Listener() {
@@ -117,7 +140,7 @@ public class SetupPanel extends Composite implements Closer {
 				DirectoryDialog folderdlg = new DirectoryDialog(cunchu
 						.getParent().getShell());
 				// 设置文件对话框的标题
-				folderdlg.setText("文件选择");
+				folderdlg.setText("文件夹选择");
 				// 设置初始路径
 				folderdlg.setFilterPath("SystemDrive");
 				// 设置对话框提示文本信息
@@ -136,7 +159,7 @@ public class SetupPanel extends Composite implements Closer {
 				this.getClass().getResourceAsStream(
 						"/images/setup_open.png"));
 		dkwjj.setImage(openImage);
-		dkwjj.setBounds(300, 130, 100, 25);
+		dkwjj.setBounds(300, 170, 100, 25);
 		dkwjj.setBackground(SWTResourceManager.getColor(244, 253, 209));
 		dkwjj.addListener(SWT.MouseUp, new Listener() {
 			@Override
@@ -152,6 +175,9 @@ public class SetupPanel extends Composite implements Closer {
 		
 		ctb1.setControl(setupCP);
 		
+		/*
+		 * 课程信息设置
+		 */
 		CTabItem ctb2 = new CTabItem(ctf, SWT.NONE);
 		ctb2.setText("   课程信息      ");
 		//课程信息面板
@@ -204,6 +230,107 @@ public class SetupPanel extends Composite implements Closer {
 		
 		ctb2.setControl(classInfoCP);
 		
+		/*
+		 * 水印设置
+		 */
+		CTabItem ctb3 = new CTabItem(ctf, SWT.NONE);
+		ctb3.setText("   水印设置     ");
+		//水印设置面板
+		Composite waterInfoCP = new Composite(ctf, SWT.NONE);
+		waterInfoCP.setBounds(cpLocation);
+		
+		//图片水印
+		int[] tplocation = {100,50,80,30};
+		new MyLabel(waterInfoCP, SWT.NONE, "图片水印", tplocation);
+		
+		final Text tupianPath = new Text(waterInfoCP, SWT.BORDER);
+		tupianPath.setBounds(200, 50, 150, 20);
+		tupianPath.setEditable(false);
+		String water_img = properties.getProperty("water_img");
+		if(null != water_img){
+			tupianPath.setText(water_img);
+		}
+		Label ggml1 = new Label(waterInfoCP, SWT.NONE);
+//		ggml1.setImage(changeImage);
+		ggml1.setText("选择图片");
+		ggml1.setBounds(400, 50, 60, 25);
+		ggml1.setBackground(SWTResourceManager.getColor(255, 255, 0));
+		
+
+		ggml1.addListener(SWT.MouseUp, new Listener() {
+			@Override
+			public void handleEvent(Event event) {
+				FileDialog filedlg=new FileDialog(cunchu
+						.getParent().getShell(),SWT.OPEN);
+				//设置文件对话框的标题
+				filedlg.setText("文件选择");
+				//设置初始路径
+				filedlg.setFilterPath("SystemRoot");
+				//打开文件对话框，返回选中文件的绝对路径
+				String selected=filedlg.open();
+				if(null != selected){
+					tupianPath.setText(selected);
+				}
+			}
+		});
+		
+		
+		//文字水印
+		int[] wzlocation = {100,90,80,30};
+		new MyLabel(waterInfoCP, SWT.NONE, "文字水印", wzlocation);
+		
+		final Text wenzi = new Text(waterInfoCP, SWT.BORDER);
+		wenzi.setBounds(200, 90, 200, 20);
+		String water_text = properties.getProperty("water_text");
+		if(null != water_text){
+			wenzi.setText(water_text);
+		}
+		
+		//字体
+		int[] ztlocation = {100,130,80,30};
+		new MyLabel(waterInfoCP, SWT.NONE, "字体/颜色", ztlocation);
+		
+		final Combo ztcombo = new Combo(waterInfoCP, SWT.READ_ONLY);
+		ztcombo.setBounds(200, 130, 80, 30);
+		ztcombo.setItems(Constants.SETUP_Constant.arr);
+		String water_text_size = properties.getProperty("water_text_size");
+		if(null != water_text_size){
+			ztcombo.setText(water_text_size);
+		}
+		
+		final Combo yscombo = new Combo(waterInfoCP, SWT.READ_ONLY);
+		yscombo.setBounds(300, 130, 100, 30);
+		yscombo.setItems(Constants.SETUP_Constant.color);
+		String yanse = properties.getProperty("water_text_color");
+		for (int i = 0; i < Constants.SETUP_Constant.color.length; i++) {
+			if(Constants.SETUP_Constant.color_value[i].equals(yanse)){
+				yscombo.select(i);
+			}
+			yscombo.setData(Constants.SETUP_Constant.color[i],
+					Constants.SETUP_Constant.color_value[i]);
+		}
+		
+		
+		//水印位置
+		int[] waterlocation = {100,170,80,30};
+		new MyLabel(waterInfoCP, SWT.NONE, "水印位置", waterlocation);
+		
+		final Combo wzcombo = new Combo(waterInfoCP, SWT.READ_ONLY);
+		wzcombo.setBounds(200, 170, 80, 30);
+		wzcombo.setItems(Constants.SETUP_Constant.water_location);
+		String weizhi = properties.getProperty("water_location");
+		for (int i = 0; i < Constants.SETUP_Constant.water_location.length; i++) {
+			if(Constants.SETUP_Constant.water_location_value[i].equals(weizhi)){
+				wzcombo.select(i);
+			}
+			wzcombo.setData(Constants.SETUP_Constant.water_location[i],
+					Constants.SETUP_Constant.water_location_value[i]);
+		}
+		
+		
+		
+		
+		
 		
 		//底部按鈕
 		// 恢复默认
@@ -235,6 +362,8 @@ public class SetupPanel extends Composite implements Closer {
 				//保存
 				boolean dplzFlag = dplz.getSelection();
 				String videoPath = cunchu.getText();
+				String frameRate = zlcombo.getText();
+				Object zl = zlcombo.getData(frameRate);
 				
 				//课程信息
 				String themeStr = themeText.getText();
@@ -242,14 +371,38 @@ public class SetupPanel extends Composite implements Closer {
 				String teacherStr = teacherText.getText();
 				String infoStr = infoText.getText();
 				
+				//水印
+				String water_img = tupianPath.getText();
+				String water_text = wenzi.getText();
+				String water_text_size = ztcombo.getText();
+				String yanse = yscombo.getText();
+				Object water_text_color = yscombo.getData(yanse);
+				if(null == water_text_color){
+					water_text_color = 1;
+				}
+				String weizhi = wzcombo.getText();
+				Object water_location = wzcombo.getData(weizhi);
+				if(null == water_location){
+					water_location = 3;
+				}
+				
 				File file = new File("user.properties");
 				Properties properties = new Properties();
+				//常规设置
 				properties.setProperty("dplzFlag", dplzFlag+"");
 				properties.setProperty("videoPath", videoPath);
+				properties.setProperty("frameRate", zl.toString());
+				//课程信息
 				properties.setProperty("themeStr", themeStr);
 				properties.setProperty("schoolStr", schoolStr);
 				properties.setProperty("teacherStr", teacherStr);
 				properties.setProperty("infoStr", infoStr);
+				//水印
+				properties.setProperty("water_img", water_img);
+				properties.setProperty("water_text", water_text);
+				properties.setProperty("water_text_size", water_text_size);
+				properties.setProperty("water_text_color", water_text_color.toString());
+				properties.setProperty("water_location", water_location.toString());
 				
 				PropertyUtil.setValue(properties, file);
 				RecordConfig config = RecordConfig.get();

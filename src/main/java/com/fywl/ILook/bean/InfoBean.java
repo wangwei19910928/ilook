@@ -9,7 +9,7 @@ public class InfoBean {
 	
 	private String type;
 	
-	private Integer trainAge;
+	private String trainAge;
 
 	public String getSchool() {
 		return school;
@@ -35,11 +35,12 @@ public class InfoBean {
 		this.type = type;
 	}
 
-	public Integer getTrainAge() {
+	public String getTrainAge() {
 		return trainAge;
 	}
 
-	public void setTrainAge(Integer trainAge) {
+	public void setTrainAge(String trainAge) {
 		this.trainAge = trainAge;
 	}
+
 }

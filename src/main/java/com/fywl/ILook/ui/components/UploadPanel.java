@@ -3,6 +3,8 @@ package com.fywl.ILook.ui.components;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 
 import org.eclipse.nebula.widgets.cdatetime.CDT;
 import org.eclipse.nebula.widgets.cdatetime.CDateTime;
@@ -25,6 +27,7 @@ import com.fywl.ILook.bean.UploadFileItem;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.utils.HttpRequest;
 import com.fywl.ILook.utils.ImageUtil;
+import com.fywl.ILook.utils.MyUtils;
 
 public class UploadPanel extends Composite implements Closer {
 	private String videoName;
@@ -139,21 +142,20 @@ public class UploadPanel extends Composite implements Closer {
 				String endTime = dateTime1.getText();
 				String bz = textBZ.getText();
 
-				// ArrayList<FormFieldKeyValuePair> ffkvp = new
-				// ArrayList<FormFieldKeyValuePair>();
-				// ffkvp.add(new FormFieldKeyValuePair("title", bt));
-				// ffkvp.add(new FormFieldKeyValuePair("tag", bq));
-				// ffkvp.add(new FormFieldKeyValuePair("key", a.toString()));
-				// ffkvp.add(new FormFieldKeyValuePair("type", km));
-				// ffkvp.add(new FormFieldKeyValuePair("flag", radio1
-				// .getSelection() ? true + "" : false + ""));
-				// ffkvp.add(new FormFieldKeyValuePair("beginTime", beginTime));
-				// ffkvp.add(new FormFieldKeyValuePair("endTime", endTime));
-				// ffkvp.add(new FormFieldKeyValuePair("info", bz));
+				final Map<String, String> map = new HashMap<String, String>();
+				map.put("title", bt);
+				map.put("lable", bq);
+				map.put("subject", km);
+				map.put("subjectcode", a.toString());
+				map.put("beginTime", beginTime);
+				map.put("endTime", endTime);
+				map.put("bz", bz);
+				map.put("code", MyUtils.getLocalMac());
 
 				ArrayList<UploadFileItem> ufi = new ArrayList<UploadFileItem>();
-				videoName = "E://ssdgdfg" + File.separator
-						+ "test1-16gb.mp4";
+//				videoName = "E://ssdgdfg" + File.separator
+//						+ "test1-16gb.mp4";
+				System.out.println(videoName);
 				ufi.add(new UploadFileItem("upload1", videoName));
 				final String[] response = {""};
 				try {
@@ -161,7 +163,7 @@ public class UploadPanel extends Composite implements Closer {
 					final Composite mp = new Composite(confirmLabel.getParent()
 							.getShell(), SWT.NO_BACKGROUND);
 					mp.setBounds(0, 0, 500, 440);
-					mp.moveAbove(null);
+					mp.moveAbove(textBZ.getParent());
 					// 展现层
 					final Composite mp1 = new EmptyPanel(mp, SWT.NONE, "正在上传");
 					// // 进度条
@@ -184,11 +186,12 @@ public class UploadPanel extends Composite implements Closer {
 							});
 							response[0] = HttpRequest.uploadFile(
 									Constants.UPLOAD_Constant.HTTP_UPLOAD_URL,
-									videoName);
+									videoName,map);
 							getDisplay().asyncExec(new Runnable() {
 								public void run() {
 									// 销毁展现层
 									mp1.dispose();
+									System.out.println(response[0]);
 									if (response[0].contains("O")) {
 										// 上传成功提示框
 										new EmptyPanel(mp, SWT.NONE, "上传成功", "  关 闭 ",

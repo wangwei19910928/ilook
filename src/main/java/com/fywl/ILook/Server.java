@@ -16,13 +16,14 @@ public class Server {
 		InfoBean ib = new InfoBean();
 		ib.setName("张三疯");
 		ib.setSchool("北京市第三中学");
-		ib.setTrainAge(3);
+		ib.setTrainAge(3+"");
 		ib.setType("体育");
 		
 		RecordConfig rc = RecordConfig.get();
-		rc.setSingleRecording(true);
+		rc.setSingleRecording(false);
 		rc.setVideoSize(Toolkit.getDefaultToolkit().getScreenSize());
 		new FunctionMainWindow(ib,rc);
+		
 
 	}
 

@@ -30,7 +30,6 @@ import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.FootLabel;
 import com.fywl.ILook.ui.components.InfoLaber;
-import com.fywl.ILook.ui.components.MyLabel;
 import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.components.panel.impl.TitlePanel;
@@ -38,6 +37,7 @@ import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.DESCrypt;
 import com.fywl.ILook.utils.HttpRequest;
 import com.fywl.ILook.utils.ImageUtil;
+import com.fywl.ILook.utils.MyUtils;
 import com.fywl.ILook.utils.PropertyUtil;
 
 public class LoginMainWindow extends MainWindow implements Closer {
@@ -284,17 +284,20 @@ public class LoginMainWindow extends MainWindow implements Closer {
 			@Override
 			public void handleEvent(Event event) {
 				// 登录中····
-				// pb.setVisible(true);
-				// pb.moveAbove(null);
 				cp.setVisible(false);
+				// // 请求服务器
+				final String email = text.getText();
+				final String pass = text_1.getText();
 				// 登录
 				String str = HttpRequest.sendGet(
 						Constants.LOGIN_HEAD_Constant.HTTP_LOGIN_URL,
-						"username=" + text.getText() + "&password="
-								+ text_1.getText());
+						"email=" + email + "&password="
+								+ pass + "&code=" + MyUtils.getLocalMac());
+				//{"status":"success","user":"fasdf,25,王强,数学"}
+System.out.println(str); 
 
 				// 成功
-				if (str.equals("1")) {
+				if (str.contains("\"status\":\"success\"")) {
 					// 保存用户信息到本地
 					Properties properties = new Properties();
 					properties.setProperty("username", text.getText());
@@ -308,10 +311,12 @@ public class LoginMainWindow extends MainWindow implements Closer {
 					tray.dispose();
 					shell.dispose();
 					InfoBean ib = new InfoBean();
-					ib.setName("张三疯");
-					ib.setSchool("北京市第三中学");
-					ib.setTrainAge(3);
-					ib.setType("体育");
+					
+					String[] infoArr = str.substring(str.indexOf("user\":\"")+7,str.lastIndexOf("\"")).split(",");
+					ib.setName(infoArr[2]);
+					ib.setSchool(infoArr[0]);
+					ib.setTrainAge(infoArr[1]);
+					ib.setType(infoArr[3]);
 
 					// 打开网站
 					FileInputStream fis;
@@ -326,18 +331,18 @@ public class LoginMainWindow extends MainWindow implements Closer {
 						// TODO Auto-generated catch block
 						e.printStackTrace();
 					}
-					String openWebsiteAfterLoginFlag = properties
-							.getProperty("openWebsiteAfterLoginFlag");
-					if ("true".equals(openWebsiteAfterLoginFlag)) {
-						try {
-							Runtime.getRuntime().exec(
-									"rundll32 url.dll,FileProtocolHandler http://"
-											+ Constants.Shell_Constant.WEBSITE);
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-					}
+//					String openWebsiteAfterLoginFlag = properties
+//							.getProperty("openWebsiteAfterLoginFlag");
+//					if ("true".equals(openWebsiteAfterLoginFlag)) {
+//						try {
+//							Runtime.getRuntime().exec(
+//									"rundll32 url.dll,FileProtocolHandler http://"
+//											+ Constants.Shell_Constant.WEBSITE);
+//						} catch (IOException e) {
+//							// TODO Auto-generated catch block
+//							e.printStackTrace();
+//						}
+//					}
 
 					RecordConfig rc = RecordConfig.get();
 					rc.setSingleRecording(false);

@@ -151,14 +151,14 @@ public class Constants {
 		// 登录按钮位置
 		public int[] LOGIN_LOCATION = { 192, 170, 200, 40 };
 		// 登录请求url
-		public String HTTP_LOGIN_URL = "http://localhost:8080/web/login";
+		public String HTTP_LOGIN_URL = "http://192.168.18.4:8080/check";
 	}
 
 	// 上传时候的常量
 	public interface UPLOAD_Constant {
 		public String[] TYPE = { "数学", "语文", "英语", "物理", "化学" };
 		public String[] KEY = { "1", "2", "3", "4", "5" };
-		public String HTTP_UPLOAD_URL = "http://127.0.0.1:8080/web/upload";
+		public String HTTP_UPLOAD_URL = "http://192.168.18.4:8080/upload/f_upload";
 	}
 
 	// 设置部分常量
@@ -168,5 +168,12 @@ public class Constants {
 		public boolean openWebsiteAfterLoginFlag = false;
 		public boolean showIconFlag = false;
 		public String videoPath = System.getProperty("user.dir");
+		public String[] arr = {"20","25","30","35","40","45","50","55","60"};
+		public String[] water_location = {"左上角","右上角","右下角","左下角"};
+		public String[] water_location_value = {"1","2","3","4"};
+		public String[] color = {"蓝色","黑色"};
+		public String[] color_value = {"255","1"};
+		public String[] frame_rate = {"20","25"};
+		public String[] frame_rate_value = {"50000","40000"};
 	}
 }
