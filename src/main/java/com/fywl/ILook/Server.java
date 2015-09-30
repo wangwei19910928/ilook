@@ -20,7 +20,7 @@ public class Server {
 		ib.setType("体育");
 		
 		RecordConfig rc = RecordConfig.get();
-		rc.setSingleRecording(false);
+		rc.setSingleRecording(true);
 		rc.setVideoSize(Toolkit.getDefaultToolkit().getScreenSize());
 		new FunctionMainWindow(ib,rc);
 		

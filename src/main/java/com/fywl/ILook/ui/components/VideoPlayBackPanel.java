@@ -34,22 +34,21 @@ public class VideoPlayBackPanel extends Composite {
 			int index) {
 		super(parent, SWT.EMBEDDED);
 		Webcam wb = Webcam.getWebcams().get(index);
+//		if(null != wb){
+//			webcam = wb;
+//		}
 		if (null != wb) {
 			webcam = wb;
 			webcam.setViewSize(size);
+			Dimension[] nonStandardResolutions = new Dimension[] {
+					new Dimension(2048, 1536),
+					new Dimension(1280, 960),
+					new Dimension(1024, 768),
+			};
+			webcam.setCustomViewSizes(nonStandardResolutions);
 			if(1 == index){
 				mirrored = true;
-				Dimension[] nonStandardResolutions = new Dimension[] {
-						new Dimension(2048, 1536),
-					};
-				webcam.setCustomViewSizes(nonStandardResolutions);
 				webcam.setViewSize(new Dimension(2048, 1536));
-//			}else{
-//				Dimension[] nonStandardResolutions = new Dimension[] {
-//						new Dimension(1024, 768),
-//					};
-//				webcam.setCustomViewSizes(nonStandardResolutions);
-//				webcam.setViewSize(new Dimension(1024, 768));
 			}
 			
 		}
@@ -64,6 +63,7 @@ public class VideoPlayBackPanel extends Composite {
 	public void start() {
 		if (webcam != null) {
 //			webcam.setViewSize(size);
+			System.out.println(webcam.getViewSize());
 			panel = new WebcamPanel(webcam, webcam.getViewSize(), false);
 			panel.setFPSLimit(25);
 //			mirror();
@@ -72,6 +72,15 @@ public class VideoPlayBackPanel extends Composite {
 			panel.start();
 			running = true;
 		}
+		
+//		if (webcam != null) {
+//			webcam.setViewSize(size);
+//			panel = new WebcamPanel(webcam, size, false);
+//			root.getContentPane().add(panel);
+//			frame.setVisible(true);
+//			panel.start();
+//			running = true;
+//		}
 	}
 
 	public void stop() {

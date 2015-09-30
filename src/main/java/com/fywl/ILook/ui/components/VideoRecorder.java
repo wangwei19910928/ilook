@@ -1,8 +1,6 @@
 package com.fywl.ILook.ui.components;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
-import java.awt.Composite;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
@@ -11,13 +9,17 @@ import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.Toolkit;
 import java.awt.image.BufferedImage;
+import java.awt.image.ColorModel;
+import java.awt.image.WritableRaster;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.Properties;
+import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -49,12 +51,6 @@ import com.xuggle.xuggler.video.IConverter;
 
 public class VideoRecorder implements ImageRecorder {
 
-//	private VideoPlayBackPanel faceVideoPlayback = null;
-//
-//	private ScreenPlayBackPanel screenPlayBackPanel = null;
-//
-//	private VideoPlayBackPanel otherVideoPlayback = null;
-
 	private MediaReader reader = null;
 
 	private RecordConfig config;
@@ -67,14 +63,9 @@ public class VideoRecorder implements ImageRecorder {
 
 	}
 
-	public VideoRecorder(VideoPlayBackPanel faceVideoPlayback,
-			ScreenPlayBackPanel screenPlayBackPanel,
-			VideoPlayBackPanel otherVideoPlayback, RecordConfig config) {
+	public VideoRecorder( RecordConfig config) {
 		this.config = config;
 		reader = new MediaReader(config);
-//		this.faceVideoPlayback = faceVideoPlayback;
-//		this.screenPlayBackPanel = screenPlayBackPanel;
-//		this.otherVideoPlayback = otherVideoPlayback;
 	}
 
 	public void start() {
@@ -91,7 +82,14 @@ public class VideoRecorder implements ImageRecorder {
 		//初始化屏幕参数
 		ImageUtil.getInstance().initSizeAndHeight();
 		g = reader.start();
-		System.out.println("录制方式=" + config.isSingleRecording());
+//		ExecutorService executor = Executors.newFixedThreadPool(2);
+//		BlockingQueue<BufferedImage> bq = new LinkedBlockingDeque<>();
+////		new MediaWriter(bq).start();
+//		executor.submit(new MediaWriter(bq));
+//		CacheImage ci = new CacheImage(bq);
+//		g = ci.start();
+//		System.out.println("录制方式=" + config.isSingleRecording());
+//		executor.submit(ci);
 	}
 
 	public void stop() {
@@ -272,7 +270,10 @@ class MediaReader implements Runnable {
 	public void run() {
 		String videoSavePath = Constants.SETUP_Constant.videoPath;
 		if (null != properties) {
-			videoSavePath = properties.getProperty("videoPath");
+			String videoPath = properties.getProperty("videoPath");
+			if(isNotEmpty(videoPath)){
+				videoSavePath = properties.getProperty("videoPath");
+			}
 		}
 		videoName = videoSavePath + File.separator + System.currentTimeMillis()
 				+ "test.mp4";
@@ -325,69 +326,73 @@ class MediaReader implements Runnable {
 			if (!config.isSingleRecording()) {
 				biy = ImageUtil.getInstance().getBufferedImage(
 						"images/separated_y.png");
-				String themeStr = properties.getProperty("themeStr");
-				themeStr = (null == themeStr ? "":themeStr);
-				if(themeStr.length()>12){
-					teacherArr[0] = themeStr.substring(0, 11);
-					teacherArr[1] = themeStr.substring(11);
-				}else{
-					teacherArr[0] = themeStr;
-				}
-				String teacherStr = properties.getProperty("teacherStr");
-				teacherStr = (null == teacherStr ? "":teacherStr);
-				if(teacherStr.length()>12){
-					teacherArr[0] = teacherStr.substring(0, 11);
-					teacherArr[1] = teacherStr.substring(11);
-				}else{
-					teacherArr[0] = teacherStr;
-				}
-				String schoolStr = properties.getProperty("schoolStr");
-				schoolStr = (null == schoolStr ? "":schoolStr);
-				if(schoolStr.length()>12){
-					schoolArr[0] = schoolStr.substring(0, 11);
-					schoolArr[1] = schoolStr.substring(11);
-				}else{
-					schoolArr[0] = schoolStr;
-				}
-				String infoStr = properties.getProperty("infoStr");
-				infoStr = (null == infoStr ? "":infoStr);
-				if(infoStr.length()>12){
-					infoArr[0] = infoStr.substring(0, 11);
-					infoArr[1] = infoStr.substring(11);
-				}else{
-					infoArr[0] = infoStr;
+				if(null != properties){
+					String themeStr = properties.getProperty("themeStr");
+					themeStr = (null == themeStr ? "":themeStr);
+					if(themeStr.length()>12){
+						themeArr[0] = themeStr.substring(0, 11);
+						themeArr[1] = themeStr.substring(11);
+					}else{
+						themeArr[0] = themeStr;
+					}
+					String teacherStr = properties.getProperty("teacherStr");
+					teacherStr = (null == teacherStr ? "":teacherStr);
+					if(teacherStr.length()>12){
+						teacherArr[0] = teacherStr.substring(0, 11);
+						teacherArr[1] = teacherStr.substring(11);
+					}else{
+						teacherArr[0] = teacherStr;
+					}
+					String schoolStr = properties.getProperty("schoolStr");
+					schoolStr = (null == schoolStr ? "":schoolStr);
+					if(schoolStr.length()>12){
+						schoolArr[0] = schoolStr.substring(0, 11);
+						schoolArr[1] = schoolStr.substring(11);
+					}else{
+						schoolArr[0] = schoolStr;
+					}
+					String infoStr = properties.getProperty("infoStr");
+					infoStr = (null == infoStr ? "":infoStr);
+					if(infoStr.length()>12){
+						infoArr[0] = infoStr.substring(0, 11);
+						infoArr[1] = infoStr.substring(11);
+					}else{
+						infoArr[0] = infoStr;
+					}
 				}
 			}
 			
 			String[] water = {"","我的水印","10","255","3"};//图片路劲，文字，大小，颜色，位置
-			String waterImg = properties.getProperty("water_img");
-			if(null != waterImg && !"".equals(waterImg)){
-				water[0] = waterImg;
-//				img = ImageUtil.getInstance().getBufferedImage(
-//						waterImg);
-				img = ImageIO.read(new File(waterImg));
+			String framerate = null;
+			if(null != properties){
+				String waterImg = properties.getProperty("water_img");
+				if(isNotEmpty(waterImg)){
+					water[0] = waterImg;
+					File file = new File(waterImg);
+					if(file.exists()){
+						img = ImageIO.read(file);
+					}
+				}
+				String waterText = properties.getProperty("water_text");
+				if(isNotEmpty(waterText)){
+					water[1] = waterText;
+				}
+				String water_text_size = properties.getProperty("water_text_size");
+				if(isNotEmpty(water_text_size)){
+					water[2] = water_text_size;
+				}
+				String water_text_color = properties.getProperty("water_text_color");
+				if(isNotEmpty(water_text_color)){
+					water[3] = water_text_color;
+				}
+				String water_location = properties.getProperty("water_location");
+				if(isNotEmpty(water_location)){
+					water[4] = water_location;
+				}
+				framerate = properties.getProperty("frameRate");
 			}
-			String waterText = properties.getProperty("water_text");
-			if(null != waterText && !"".equals(waterText)){
-				water[1] = waterText;
-			}
-			String water_text_size = properties.getProperty("water_text_size");
-			if(null != water_text_size && !"".equals(water_text_size)){
-				water[2] = water_text_size;
-			}
-			String water_text_color = properties.getProperty("water_text_color");
-			if(null != water_text_color && !"".equals(water_text_color)){
-				water[3] = water_text_color;
-			}
-			String water_location = properties.getProperty("water_location");
-			if(null != water_location && !"".equals(water_location)){
-				water[4] = water_location;
-			}
-//			changeVideo();
-//			customAudioVideoStream();
-			String framerate = properties.getProperty("frameRate");
-			System.out.println(framerate);
-			int frameCount = (null == framerate || "".equals(framerate) ? 50000 : Integer.parseInt(framerate));
+			
+			int frameCount = (isNotEmpty(framerate) ? Integer.parseInt(framerate) : 50000);
 			while (record) {
 				while (pauseFlag) {
 					createVideo(writer, audioBuf, format, line,biy,themeArr,teacherArr,schoolArr,infoArr,water,img,frameCount);
@@ -457,17 +462,17 @@ class MediaReader implements Runnable {
 		smp.put(audioBuf, 0, 0, nBytesRead);
 		smp.setComplete(true, numSample, (int) format.getSampleRate(), 1,
 				IAudioSamples.Format.FMT_S16, line.getMicrosecondPosition());
-		while(t1<line.getMicrosecondPosition()){
-			if(null != g){
-//				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
-				drawWater(g, water, img);
-			}
-			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
-			t1 += frameCount;
-		}
+//		while(t1<line.getMicrosecondPosition()){
+//			if(null != g){
+////				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
+//				drawWater(g, water, img);
+//			}
+//			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
+//			t1 += frameCount;
+//		}
 //		t1 += 15000;
 //		t1 += 45000;
-//		writer.encodeVideo(0, frame);
+		writer.encodeVideo(0, frame);
 		writer.encodeAudio(1, smp);
 	}
 
@@ -609,7 +614,14 @@ class MediaReader implements Runnable {
 	}
 	
 	
-	
+	private boolean isNotEmpty(String str){
+		if(null == str){
+			return false;
+		}else if("".equals(str.trim())){
+			return false;
+		}
+		return true;
+	}
 	
 	
 	
@@ -736,4 +748,206 @@ System.out.println(stream.toString());
 
 	    writer.close();
 	  }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+/**
+ * 缓存image的线程
+ * @author Administrator
+ *
+ */
+class CacheImage implements Runnable{
+	
+	public ExecutorService executor = Executors.newFixedThreadPool(2);
+	//存储image的队列
+	private BlockingQueue<BufferedImage> bq;
+	
+	private RecordConfig config;
+
+	private Graphics g = null;
+	
+	private BufferedImage combined = null;
+	
+	public CacheImage(BlockingQueue<BufferedImage> bq){
+		this.bq = bq;
+	}
+	
+
+	@Override
+	public void run() {
+		try {
+			Thread.sleep(1000);
+		} catch (InterruptedException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		while(true){
+			if(null != combined){
+				try {
+					bq.put(deepCopy(combined));
+					Thread.sleep(50);
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+				System.out.println("cache=="+bq.size());
+					
+			}
+		}
+	}
+	
+	public Graphics start() {
+		combined = new BufferedImage((int) 1600,
+				(int) 900, BufferedImage.TYPE_3BYTE_BGR);
+//		executor.submit(this);
+		g = combined.getGraphics();
+		System.out.println(g);
+		Webcam.getWebcams().get(1)
+		.addWebcamListener(new VideoListener(g, 0, 0,
+				1200, 720));
+		return g;
+	}
+	
+	//clone
+	 private BufferedImage deepCopy(BufferedImage bi) {
+		 ColorModel cm = bi.getColorModel();
+		 boolean isAlphaPremultiplied = cm.isAlphaPremultiplied();
+		 WritableRaster raster = bi.copyData(null);
+		 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
+	 }
+	
+}
+
+
+/**
+ * 合成视频的线程
+ * @author Administrator
+ *
+ */
+class MediaWriter implements Runnable{
+	
+	public ExecutorService executor = Executors.newFixedThreadPool(2);
+	
+	private BlockingQueue<BufferedImage> bq;
+	
+	public MediaWriter(BlockingQueue<BufferedImage> bq){
+		this.bq = bq;
+	}
+	
+	public void start() {
+		executor.submit(this);
+	}
+	
+	@Override
+	public void run() {
+		// TODO Auto-generated method stub
+		int videoStreamIndex = 0;
+	    int videoStreamId = 0;
+	    long deltaTime = 30000;
+	    int w = 1600;
+	    int h = 900;
+
+	    // audio parameters
+
+	    int audioStreamIndex = 1;
+	    int audioStreamId = 0;
+	    int channelCount = 2;
+//	    int sampleRate = 16000;//576
+	    //time base=1/90000;frame rate=0/0;sample rate=44100;channels=2;];framerate:0/0;timebase:1/90000;direction:OUTBOUND;]
+	    int sampleRate = 44100;//576
+
+	    // create the writer
+		String videoName = "E:/ssdgdfg" + File.separator + System.currentTimeMillis()
+				+ "test.mp4";
+		IMediaWriter writer = ToolFactory.makeWriter(videoName);
+
+	    // add the video stream
+	    ICodec videoCodec = ICodec.findEncodingCodec(ICodec.ID.CODEC_ID_H264);
+	    writer.addVideoStream(videoStreamIndex, videoStreamId, videoCodec, w, h);
+
+	    // add the audio stream
+
+	    ICodec audioCodec = ICodec.findEncodingCodec(ICodec.ID.CODEC_ID_MP3);
+	    IContainer container = writer.getContainer();
+	    writer.addAudioStream(audioStreamIndex, audioStreamId,
+	  	      audioCodec, channelCount, sampleRate);
+	    IStream stream = container.getStream(audioStreamIndex);
+	    int sampleCount = stream.getStreamCoder().getDefaultAudioFrameSize();
+	    // create a place for audio samples and video pictures
+
+	    IAudioSamples samples = IAudioSamples.make(sampleCount, channelCount);
+	    IVideoPicture picture = IVideoPicture.make(IPixelFormat.Type.YUV420P, w, h);
+
+	    // create the tone generator
+
+	    TestAudioSamplesGenerator generator = new TestAudioSamplesGenerator();
+	    generator.prepare(channelCount, sampleRate);
+
+	    // make some media
+
+	    long videoTime = 0;
+	    long audioTime = 0;
+	    long totalSamples = 0;
+	    long totalSeconds = 6;
+
+	    // the goal is to get 6 seconds of audio and video, in this case
+	    // driven by audio, but kicking out a video frame at about the right
+	    // time
+	    int i=0;
+	    boolean flag = true;
+			while(flag){
+				
+		    while (!bq.isEmpty())
+		    {
+		      // comput the time based on the number of samples
+
+		      audioTime = (totalSamples * 900 * 100) / sampleRate;
+
+		      // if the audioTime i>= videoTime then it's time for a video frame
+
+		      if (audioTime <= videoTime)
+		      {
+		        
+		        picture.setPts(videoTime);
+		        writer.encodeVideo(videoStreamIndex, bq.poll(), videoTime,
+		            Global.DEFAULT_TIME_UNIT);
+		      
+		        videoTime += deltaTime;
+		      }
+
+		      // generate audio
+		      
+		      generator.fillNextSamples(samples, sampleCount);
+		      writer.encodeAudio(audioStreamIndex, samples);
+		      totalSamples += samples.getNumSamples();
+		      
+		      System.out.println("hecheng=="+ i++);
+		    }
+		    
+		    if(3600 == i)
+		    	break;
+			}
+
+		    // close the writer
+
+		    writer.close();
+		    System.out.println("-------------------------------------");
+		    try {
+				Thread.sleep(5000);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
 }

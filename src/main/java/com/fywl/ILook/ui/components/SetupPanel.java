@@ -99,7 +99,7 @@ public class SetupPanel extends Composite implements Closer {
 		final Combo zlcombo = new Combo(setupCP, SWT.READ_ONLY);
 		zlcombo.setBounds(200, 90, 80, 30);
 		zlcombo.setItems(Constants.SETUP_Constant.frame_rate);
-		String frameRate = properties.getProperty("frameRate");
+		String frameRate = (null == properties.getProperty("frameRate") || "".equals(properties.getProperty("frameRate")) ? "50000":properties.getProperty("frameRate"));
 		for (int i = 0; i < Constants.SETUP_Constant.frame_rate.length; i++) {
 			if(Constants.SETUP_Constant.frame_rate_value[i].equals(frameRate)){
 				zlcombo.setText(frameRate);

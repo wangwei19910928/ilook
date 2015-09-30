@@ -22,7 +22,6 @@ import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.components.panel.impl.TitlePanel;
 import com.fywl.ILook.ui.components.panel.impl.ToolPanel;
-import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.ImageUtil;
 import com.melloware.jintellitype.HotkeyListener;
@@ -32,11 +31,9 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	protected RecordConfig config;
 
-	private ScreenPlayBackPanel screenPlayBackPanel;
+	private VideoPlayBackPanel faceVideoPlayback = new VideoPlayBackPanel(shell,  0);
 
-	private VideoPlayBackPanel faceVideoPlayback;
-
-	private VideoPlayBackPanel otherVideoPlayback;
+	private VideoPlayBackPanel otherVideoPlayback = new VideoPlayBackPanel(shell,  1);
 
 	private VideoRecorder recorder;
 	
@@ -53,21 +50,13 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		this();
 		this.ib = ib;
 		this.config = config;
+		recorder = new VideoRecorder(config);
 
 		init();
 	}
 
 	@Override
 	protected void beforeInit() {
-//		config = new RecordConfig();
-		screenPlayBackPanel = new ScreenPlayBackPanel(shell, SWT.NO_BACKGROUND);
-
-		faceVideoPlayback = new VideoPlayBackPanel(shell,  0);
-
-		otherVideoPlayback = new VideoPlayBackPanel(shell,  1);
-
-		recorder = new VideoRecorder(faceVideoPlayback,screenPlayBackPanel, otherVideoPlayback,config);
-
 		tray = display.getSystemTray();
 	}
 
@@ -169,6 +158,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	// 初始化屏幕监控
 	private void initScreenPanel() {
+		ScreenPlayBackPanel screenPlayBackPanel = new ScreenPlayBackPanel(shell, SWT.NO_BACKGROUND);
 		screenPlayBackPanel.setFaceVideoPlayBackPanel(faceVideoPlayback);
 		screenPlayBackPanel.setOtherVideoPlayBackPanel(otherVideoPlayback);
 

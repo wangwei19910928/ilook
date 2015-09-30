@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="utf-8"?>
+<jnlp spec="1.0+" codebase="http://localhost:8080/web/" href="$outputFile">
+  <information>
+    <title>MicroVideo</title>
+    <vendor>Argus Software</vendor>
+    <homepage>http://www.argussoftware.com</homepage>
+    <description>web</description>
+
+    <offline-allowed/>
+    <shortcut online="true">
+      <desktop />
+      <menu submenu="QIT" />
+    </shortcut>
+  </information>
+  <security>
+     <all-permissions/>
+  </security>
+  
+  <update check="background" policy="prompt-update" />
+  
+  <resources>
+  	<j2se version="1.7+" initial-heap-size="512m" max-heap-size="512m"/>
+    <jar href="lib/ILook-0.0.1-SNAPSHOT.jar" main="true"/>
+    <jar href="lib/webcam-capture-0.3.10.jar"/>
+    <jar href="lib/slf4j-api-1.7.2.jar"/>
+    <jar href="lib/xuggle-xuggler-5.4.jar"/>
+    <jar href="lib/commons-cli-1.1.jar"/>
+    <jar href="lib/logback-core-1.0.0.jar"/>
+    <jar href="lib/logback-classic-1.0.0.jar"/>
+    <jar href="lib/logback-classic-1.0.0.jar"/>
+    <jar href="lib/jna-4.1.0.jar"/>
+    <jar href="lib/jna-platform-4.1.0.jar"/>
+    <jar href="lib/bridj-0.6.2.jar"/>
+  </resources>
+  
+  <resources os="Windows" arch="amd64">  	
+    <jar href="lib/org.eclipse.swt.win32.win32.x86_64-4.3.jar"/>
+  </resources>
+  
+  <resources os="Windows" arch="amd64">  	
+    <jar href="lib/org.eclipse.swt.win32.win32.x86_64-4.3.jar"/>
+  </resources>
+  
+  <resources os="Windows" arch="x86">
+	<jar href="lib/org.eclipse.swt.win32.win32.x86-4.3.jar"/>
+  </resources>
+	
+  <resources os="Mac\ OS\ X" arch="x86_64" > 
+    <j2se version="1.7+" initial-heap-size="512m" max-heap-size="512m" java-vm-args="-XstartOnFirstThread" />   
+	<jar href="lib/org.eclipse.swt.cocoa.macosx.x86_64-4.3.jar"/>
+  </resources>
+
+  <application-desc main-class="$mainClass"/>
+  
+</jnlp>
