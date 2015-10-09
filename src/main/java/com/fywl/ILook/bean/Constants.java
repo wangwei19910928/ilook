@@ -7,6 +7,8 @@ public class Constants {
 	public interface Shell_Constant {
 		public int WIDTH = 500;
 		public int HEIGHT = 440;
+//		public int WIDTH = 1600;
+//		public int HEIGHT = 900;
 		public String TRAY_URL = "images/record.png";
 		// 背景颜色
 		public int[] BACKGROUND = { 60, 131, 209 };
@@ -77,6 +79,15 @@ public class Constants {
 
 		public int HEIGHT = 123;
 	}
+//	public interface NOTE_Constant {
+//		public int LOCATION_X = 0;
+//
+//		public int LOCATION_Y = 0;
+//
+//		public int WIDTH = 1600;
+//
+//		public int HEIGHT = 900;
+//	}
 
 	// 信息展示部分_常量
 	public interface INFO_LABEL_Constant {

@@ -8,8 +8,13 @@ import java.io.File;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.LinkedBlockingQueue;
 
+import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.bean.RecordConfig;
+import com.fywl.ILook.ui.components.ImageRecorder;
+import com.fywl.ILook.ui.listener.VideoListener;
+import com.github.sarxos.webcam.Webcam;
 import com.xuggle.mediatool.IMediaWriter;
 import com.xuggle.mediatool.ToolFactory;
 import com.xuggle.xuggler.Global;
@@ -21,8 +26,49 @@ import com.xuggle.xuggler.IStream;
 import com.xuggle.xuggler.IVideoPicture;
 import com.xuggle.xuggler.TestAudioSamplesGenerator;
 
-public class MediaMake {
-
+public class MediaMake implements ImageRecorder{
+	
+	private Graphics g = null;
+	
+	private BlockingQueue<BufferedImage> bq;
+	
+	private CacheImage ci;
+	
+	private MediaWriter mw;
+	
+	public MediaMake(){
+		bq = new LinkedBlockingQueue<>();
+		
+		ci = new CacheImage(bq);
+		
+		mw = new MediaWriter(bq);
+	}
+	
+	
+	public void start(){
+		mw.start();
+		
+		g = ci.start();
+	}
+	
+	public void stop() {
+		ci.stop();
+	}
+	
+	@Override
+	public void recordScreen(BufferedImage image) {
+		draw(image);
+	}
+	
+	// 控制屏幕的输出位
+		private void draw(BufferedImage screen) {
+			System.out.println(11);
+		}
+	
+	
+	public static void main(String[] args) {
+		new MediaMake().start();
+	}
 }
 
 
@@ -43,6 +89,8 @@ class CacheImage implements Runnable{
 	
 	private BufferedImage combined = null;
 	
+	private boolean recordFlag = true;
+	
 	public CacheImage(BlockingQueue<BufferedImage> bq){
 		this.bq = bq;
 	}
@@ -50,7 +98,7 @@ class CacheImage implements Runnable{
 
 	@Override
 	public void run() {
-		while(true){
+		while(recordFlag){
 			if(null != combined){
 				try {
 					bq.put(deepCopy(combined));
@@ -69,7 +117,17 @@ class CacheImage implements Runnable{
 		combined = new BufferedImage((int) 1600,
 				(int) 900, BufferedImage.TYPE_3BYTE_BGR);
 		executor.submit(this);
-		return combined.getGraphics();
+		g = combined.getGraphics();
+		Webcam.getWebcams().get(0)
+		.addWebcamListener(new VideoListener(g, 1024, 768,
+				1600, 900));
+		return g;
+	}
+	
+	public void stop(){
+		recordFlag = false;
+		g = null;
+		combined = null;
 	}
 	
 	//clone
@@ -79,6 +137,8 @@ class CacheImage implements Runnable{
 		 WritableRaster raster = bi.copyData(null);
 		 return new BufferedImage(cm, raster, isAlphaPremultiplied, null);
 	 }
+
+
 	
 }
 
@@ -188,7 +248,7 @@ class MediaWriter implements Runnable{
 		      System.out.println("hecheng=="+ i++);
 		    }
 		    
-		    if(3600 == i)
+		    if(600 == i)
 		    	break;
 			}
 

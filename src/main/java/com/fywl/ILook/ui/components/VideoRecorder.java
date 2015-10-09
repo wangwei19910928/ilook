@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -82,14 +81,24 @@ public class VideoRecorder implements ImageRecorder {
 		//初始化屏幕参数
 		ImageUtil.getInstance().initSizeAndHeight();
 		g = reader.start();
-//		ExecutorService executor = Executors.newFixedThreadPool(2);
+		
+		
+		
+		/**
+		 * 多线程合成
+		 */
 //		BlockingQueue<BufferedImage> bq = new LinkedBlockingDeque<>();
-////		new MediaWriter(bq).start();
-//		executor.submit(new MediaWriter(bq));
 //		CacheImage ci = new CacheImage(bq);
+//		
+//		MediaWriter mw = new MediaWriter(bq);
+//		mw.start();
+//		try {
+//			Thread.sleep(1000);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 //		g = ci.start();
-//		System.out.println("录制方式=" + config.isSingleRecording());
-//		executor.submit(ci);
 	}
 
 	public void stop() {
@@ -809,9 +818,10 @@ class CacheImage implements Runnable{
 	public Graphics start() {
 		combined = new BufferedImage((int) 1600,
 				(int) 900, BufferedImage.TYPE_3BYTE_BGR);
-//		executor.submit(this);
+		executor.submit(this);
 		g = combined.getGraphics();
 		System.out.println(g);
+		Webcam w = Webcam.getWebcams().get(1);
 		Webcam.getWebcams().get(1)
 		.addWebcamListener(new VideoListener(g, 0, 0,
 				1200, 720));
@@ -853,7 +863,7 @@ class MediaWriter implements Runnable{
 		// TODO Auto-generated method stub
 		int videoStreamIndex = 0;
 	    int videoStreamId = 0;
-	    long deltaTime = 30000;
+	    long deltaTime = 100000;
 	    int w = 1600;
 	    int h = 900;
 
@@ -906,7 +916,6 @@ class MediaWriter implements Runnable{
 	    int i=0;
 	    boolean flag = true;
 			while(flag){
-				
 		    while (!bq.isEmpty())
 		    {
 		      // comput the time based on the number of samples
@@ -934,7 +943,7 @@ class MediaWriter implements Runnable{
 		      System.out.println("hecheng=="+ i++);
 		    }
 		    
-		    if(3600 == i)
+		    if(200 == i)
 		    	break;
 			}
 
