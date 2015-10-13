@@ -9,11 +9,13 @@ import java.util.Properties;
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.graphics.Image;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import com.fywl.ILook.bean.Constants;
+import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.MessagePanel;
 import com.fywl.ILook.ui.components.MyLabel;
@@ -21,6 +23,8 @@ import com.fywl.ILook.ui.components.UploadPanel;
 import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.utils.ImageUtil;
+import com.melloware.jintellitype.HotkeyListener;
+import com.melloware.jintellitype.JIntellitype;
 
 public class ToolPanel extends Panel {
 
@@ -260,7 +264,45 @@ public class ToolPanel extends Panel {
 				}
 			}
 		});
-
+		
+//		//添加监听esc的结束录制快捷键
+//		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+//			@Override
+//			public void onHotKey(int arg0) {
+//				switch (arg0) {
+//				case 27:
+//					Display.getDefault().asyncExec(new Runnable() {
+//						@Override
+//						public void run() {
+//							if(RecordConfig.get().isNoteRecording()){
+//								getShell().setSize(Constants.Shell_Constant.WIDTH,
+//										Constants.Shell_Constant.HEIGHT);
+//								RecordConfig.get().setChangeNoteBigToSmall(true);
+//							}
+//							Event e = new Event();
+//							e.widget = sBtn;
+//							// 主动触发button点击事件
+//							sBtn.notifyListeners(SWT.MouseUp, e);
+//						}
+//					});
+//					break;
+//				case 116:
+//					Display.getDefault().asyncExec(new Runnable() {
+//						@Override
+//						public void run() {
+//							Event e = new Event();
+//							e.widget = beginBtn;
+//							// 主动触发button点击事件
+//							beginBtn.notifyListeners(SWT.MouseUp, e);
+//						}
+//					});
+//					break;
+//				default:
+//					break;
+//				}
+//			}
+//		});
+		
 		// 刷新录制时间
 		refresh(minuteLabel, secondLabel);
 	}

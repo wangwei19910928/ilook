@@ -21,6 +21,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.PaletteData;
 import org.eclipse.swt.graphics.RGB;
 
+import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.win.ext.GDI32Extra;
 import com.fywl.ILook.win.ext.User32Extra;
 import com.fywl.ILook.win.ext.WinGDIExtra;
@@ -124,7 +125,12 @@ public class ImageUtil {
 //					 return true;
 //					 }
 					 if (wText.isEmpty() && !TASK_BAR.equals(className)) {
-					 return true;
+						 return true;
+					 }
+					 System.out.println(wText);
+					 if ("爱录课".equals(wText)) {
+						 if(!RecordConfig.get().isNoteRecording())
+							 return true;
 					 }
 					 
 					RECT bounds = new RECT();
@@ -228,7 +234,7 @@ public class ImageUtil {
 	private BufferedImage capture(HWND hWnd, boolean flag) {
 
 		HDC hdcWindow = GDI32Extra.INSTANCE.GetDCEx(hWnd, null,
-				GDI32Extra.DCX_WINDOW);
+				11);
 		HDC hdcMemDC = GDI32.INSTANCE.CreateCompatibleDC(hdcWindow);
 
 		RECT bounds = new RECT();

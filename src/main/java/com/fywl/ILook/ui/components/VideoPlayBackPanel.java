@@ -44,12 +44,13 @@ public class VideoPlayBackPanel extends Composite {
 					new Dimension(2048, 1536),
 					new Dimension(1280, 960),
 					new Dimension(1024, 768),
+					new Dimension(800, 600),
 			};
 			webcam.setCustomViewSizes(nonStandardResolutions);
-			if(1 == index){
+//			if(0 == index){
 				mirrored = true;
-				webcam.setViewSize(new Dimension(2048, 1536));
-			}
+				webcam.setViewSize(new Dimension(1280, 960));
+//			}
 			
 		}
 		init();
@@ -65,7 +66,8 @@ public class VideoPlayBackPanel extends Composite {
 //			webcam.setViewSize(size);
 			System.out.println(webcam.getViewSize());
 			panel = new WebcamPanel(webcam, webcam.getViewSize(), false);
-			panel.setFPSLimit(25);
+//			panel.setFPSLimit(25);
+			panel.setFPSDisplayed(true);
 //			mirror();
 			root.getContentPane().add(panel);
 			frame.setVisible(true);

@@ -47,13 +47,14 @@ public class RecordConfig {
 	private boolean isSingleRecording;
 	//脸部摄像头
 	private boolean changeFace;
-	//笔记摄像头和屏幕互换
+	//笔记摄像头
 	private boolean changeNote;
-	//脸部摄像头和笔记摄像头互换
+	//桌面
 	private boolean changeScreen;
 	//有切换画面的动作
 	private boolean changeFlag = false;
-
+	//笔记摄像头从全屏变小
+	private boolean changeNoteBigToSmall= false;
 	private RecordConfig() {
 
 	}
@@ -236,6 +237,14 @@ public class RecordConfig {
 
 	public void setChangeScreen(boolean changeScreen) {
 		this.changeScreen = changeScreen;
+	}
+
+	public boolean isChangeNoteBigToSmall() {
+		return changeNoteBigToSmall;
+	}
+
+	public void setChangeNoteBigToSmall(boolean changeNoteBigToSmall) {
+		this.changeNoteBigToSmall = changeNoteBigToSmall;
 	}
 	
 }

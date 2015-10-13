@@ -15,7 +15,7 @@ public  class MainWindow {
 	
 	
 	public MainWindow() {
-//		shell.setText("爱录课");
+		shell.setText("爱录课");
 	}
 	
 

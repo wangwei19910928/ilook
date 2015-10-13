@@ -226,32 +226,34 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 //			}
 //		});
 		
-		//注册三个切换快捷键
-		JIntellitype.getInstance().registerHotKey(112, JIntellitype.MOD_CONTROL, 112);
-		JIntellitype.getInstance().registerHotKey(113, JIntellitype.MOD_CONTROL, 113);
-		JIntellitype.getInstance().registerHotKey(114, JIntellitype.MOD_CONTROL, 114);
-		//添加对应时间
-		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
-			@Override
-			public void onHotKey(int arg0) {
-				switch (arg0) {
-				//录制脸部摄像头
-				case 112:
-					config.setChangeFace(true);
-					break;
-				//录制笔记摄像头
-				case 113:
-					config.setChangeNote(true);
-					break;
-				//录制桌面
-				case 114:
-					config.setChangeScreen(true);
-					break;
-				default:
-					break;
-				}
-			}
-		});
+		//注册三个切换快捷键 和 一个停止录制
+//		JIntellitype.getInstance().registerHotKey(112, JIntellitype.MOD_CONTROL, 112);
+//		JIntellitype.getInstance().registerHotKey(113, JIntellitype.MOD_CONTROL, 113);
+//		JIntellitype.getInstance().registerHotKey(114, JIntellitype.MOD_CONTROL, 114);
+//		JIntellitype.getInstance().registerHotKey(116, 0, 116);
+//		JIntellitype.getInstance().registerHotKey(27, 0, 27);
+//		//添加对应时间
+//		JIntellitype.getInstance().addHotKeyListener(new HotkeyListener() {
+//			@Override
+//			public void onHotKey(int arg0) {
+//				switch (arg0) {
+//				//录制脸部摄像头
+//				case 112:
+//					config.setChangeFace(true);
+//					break;
+//				//录制笔记摄像头
+//				case 113:
+//					config.setChangeNote(true);
+//					break;
+//				//录制桌面
+//				case 114:
+//					config.setChangeScreen(true);
+//					break;
+//				default:
+//					break;
+//				}
+//			}
+//		});
 	}
 
 	// 初始化底部工具条

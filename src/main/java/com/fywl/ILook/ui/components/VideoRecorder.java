@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -114,7 +113,7 @@ public class VideoRecorder implements ImageRecorder {
 	private void draw(BufferedImage screen) {
 		if (g != null && screen != null) {
 			if (config.isSingleRecording()) {
-				if (config.isScreenRecording()) {
+				if (config.isScreenRecording() || config.isNoteRecording()) {
 					g.drawImage(screen, 0, 0, config.getVideoSize().width,
 							config.getVideoSize().height, null);
 				}
@@ -506,8 +505,8 @@ class MediaReader implements Runnable {
 					System.out.println("录制笔记");
 					Webcam.getWebcams().get(0)
 							.removeWebcamListener(singleScreenVideo);
-					Webcam.getWebcams().get(1)
-							.addWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.addWebcamListener(singleScreenVideo);
 				} else if (config.isScreenRecording()) {
 					System.out.println("录制屏幕");
 					Webcam.getWebcams().get(0)
