@@ -9,6 +9,7 @@ import org.eclipse.swt.graphics.ImageData;
 import org.eclipse.swt.graphics.Rectangle;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
+import org.eclipse.swt.widgets.Display;
 
 import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.utils.ImageUtil;
@@ -69,7 +70,7 @@ public class ScreenPlayBackPanel extends Canvas {
 				}
 
 				if (screen != null) {
-					redraw();
+						redraw();
 					if (screenRecorder != null) {
 						screenRecorder.recordScreen(screen);
 					}

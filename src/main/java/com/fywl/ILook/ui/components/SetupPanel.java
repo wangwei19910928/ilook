@@ -1,5 +1,6 @@
 package com.fywl.ILook.ui.components;
 
+import java.awt.Dimension;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -20,27 +21,31 @@ import org.eclipse.swt.widgets.Event;
 import org.eclipse.swt.widgets.FileDialog;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
+import org.eclipse.swt.widgets.ProgressBar;
 import org.eclipse.swt.widgets.Text;
 import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.inter.Closer;
+import com.fywl.ILook.ui.mw.impl.FunctionMainWindow;
 import com.fywl.ILook.utils.ImageUtil;
 import com.fywl.ILook.utils.PropertyUtil;
 import com.fywl.ILook.utils.RegeditTool;
+import com.github.sarxos.webcam.Webcam;
 
-public class SetupPanel extends Composite implements Closer {
+public class SetupPanel extends Composite{
+	private Closer closer;
+	private VideoPlayBackPanel headVideoPlayBackPanel;
+	
+	private VideoPlayBackPanel noteVideoPlayBackPanel;
 
-	public SetupPanel(Composite parent, int style) {
+	public SetupPanel(Closer closer,Composite parent, int style,VideoPlayBackPanel face,VideoPlayBackPanel note) {
 		super(parent, style);
-
+		this.closer = closer;
+		this.headVideoPlayBackPanel=face;
+		this.noteVideoPlayBackPanel=note;
 		init1();
-	}
-
-	@Override
-	public void shutDown() {
-		this.dispose();
 	}
 	
 	private void init1(){
@@ -251,9 +256,12 @@ public class SetupPanel extends Composite implements Closer {
 			tupianPath.setText(water_img);
 		}
 		Label ggml1 = new Label(waterInfoCP, SWT.NONE);
-//		ggml1.setImage(changeImage);
-		ggml1.setText("选择图片");
-		ggml1.setBounds(400, 50, 60, 25);
+		final Image changeImage1 = ImageUtil.getInstance().getImage(
+				this.getDisplay(),
+				this.getClass().getResourceAsStream(
+						"/images/changePic.png"));
+		ggml1.setImage(changeImage1);
+		ggml1.setBounds(380, 45, 100, 25);
 		ggml1.setBackground(SWTResourceManager.getColor(255, 255, 0));
 		
 
@@ -326,9 +334,68 @@ public class SetupPanel extends Composite implements Closer {
 			wzcombo.setData(Constants.SETUP_Constant.water_location[i],
 					Constants.SETUP_Constant.water_location_value[i]);
 		}
+		ctb3.setControl(waterInfoCP);
 		
 		
+		/*
+		 * 摄像头设置
+		 */
+		CTabItem ctb4 = new CTabItem(ctf, SWT.NONE);
+		ctb4.setText("   摄像头      ");
+		//摄像头面板
+		Composite webcamCP = new Composite(ctf, SWT.NONE);
+		webcamCP.setBounds(cpLocation);
 		
+		//头部摄像头
+		int[] headWebcamlocation = {100,50,100,30};
+		new MyLabel(webcamCP, SWT.NONE, "头部摄像头", headWebcamlocation);
+		//分辨率
+		int[] headlvlocation = {100,90,100,30};
+		new MyLabel(webcamCP, SWT.NONE, "分辨率", headlvlocation);
+		//笔记摄像头
+		int[] noteWebcamlocation = {100,130,100,30};
+		new MyLabel(webcamCP, SWT.NONE, "笔记摄像头", noteWebcamlocation);
+		//分辨率
+		int[] notelvlocation = {100,170,100,30};
+		new MyLabel(webcamCP, SWT.NONE, "分辨率", notelvlocation);
+		
+		final Combo headWebcamCombo = new Combo(webcamCP, SWT.READ_ONLY);
+		headWebcamCombo.setBounds(200, 50, 180, 30);
+		
+		final Combo headlvCombo = new Combo(webcamCP, SWT.READ_ONLY);
+		headlvCombo.setBounds(200, 90, 180, 30);
+		
+		final Combo noteWebcamCombo = new Combo(webcamCP, SWT.READ_ONLY);
+		noteWebcamCombo.setBounds(200, 130, 180, 30);
+		
+		final Combo notelvCombo = new Combo(webcamCP, SWT.READ_ONLY);
+		notelvCombo.setBounds(200, 170, 180, 30);
+//		String weizhi = properties.getProperty("water_location");
+		String[] webcamList = new String[Webcam.getWebcams().size()];
+		for (int i = 0; i < Webcam.getWebcams().size(); i++) {
+//			if(Constants.SETUP_Constant.water_location_value[i].equals(weizhi)){
+//				wzcombo.select(i);
+//			}
+			webcamList[i] = Webcam.getWebcams().get(i).getName();
+			headWebcamCombo.setData(Webcam.getWebcams().get(i).getName(),i);
+			noteWebcamCombo.setData(Webcam.getWebcams().get(i).getName(),i);
+		}
+		headWebcamCombo.setItems(webcamList);
+		noteWebcamCombo.setItems(webcamList);
+		
+		
+		String[] lvStr = {"800X600","1024X768","1280X960","2048X1536"};
+		for (int i = 0; i < lvStr.length; i++) {
+//			if(Constants.SETUP_Constant.water_location_value[i].equals(weizhi)){
+//				wzcombo.select(i);
+//			}
+			headlvCombo.setData(lvStr[i],i);
+			notelvCombo.setData(lvStr[i],i);
+		}
+		headlvCombo.setItems(lvStr);
+		notelvCombo.setItems(lvStr);
+		
+		ctb4.setControl(webcamCP);
 		
 		
 		
@@ -386,6 +453,10 @@ public class SetupPanel extends Composite implements Closer {
 					water_location = 3;
 				}
 				
+				//分辨率
+				String headLV = headlvCombo.getText();
+				String noteLV = notelvCombo.getText();
+				
 				File file = new File("user.properties");
 				Properties properties = new Properties();
 				//常规设置
@@ -403,11 +474,95 @@ public class SetupPanel extends Composite implements Closer {
 				properties.setProperty("water_text_size", water_text_size);
 				properties.setProperty("water_text_color", water_text_color.toString());
 				properties.setProperty("water_location", water_location.toString());
-				
+				//分辨率
+				if(!"".equals(headLV)){
+					properties.setProperty("headLV", headLV);
+				}
+				if(!"".equals(noteLV)){
+					properties.setProperty("noteLV", noteLV);
+				}
 				PropertyUtil.setValue(properties, file);
 				RecordConfig config = RecordConfig.get();
 				config.setSingleRecording(dplzFlag);
 				
+//				// 上传状态 遮罩层
+//				final Composite mp = new Composite(getShell(), SWT.NONE);
+//				mp.setBounds(0, 0, 500, 440);
+//				mp.moveAbove(null);
+//				// 展现层
+//				final Composite mp1 = new EmptyPanel(mp, SWT.NONE, "正在上传");
+//				new Thread(new Runnable() {
+//					@Override
+//					public void run() {
+//						getDisplay().timerExec(5,new Runnable() {
+//							@Override
+//							public void run() {
+//								// TODO Auto-generated method stub
+//								// 进度条
+//								ProgressBar pb = new ProgressBar(mp1, SWT.INDETERMINATE);
+//								pb.setBounds(100, 50, 100, 20);
+//								pb.moveAbove(null);
+//							}
+//						});
+//						getDisplay().timerExec(5, this);
+//					}
+//				});
+				getShell().setVisible(false);
+				headVideoPlayBackPanel.stop();
+				noteVideoPlayBackPanel.stop();
+				//摄像头
+				String headWebcamString = headWebcamCombo.getText();
+				if(!"".equals(headWebcamString)){
+					int i = (Integer)headWebcamCombo.getData(headWebcamString);
+					headVideoPlayBackPanel.stop();
+					headVideoPlayBackPanel.dispose();
+					Webcam.getWebcams().get(i).close();
+					headVideoPlayBackPanel = new VideoPlayBackPanel(getShell(), i);
+					headVideoPlayBackPanel.setBounds(Constants.Face_Constant.LOCATION_X,
+							Constants.Face_Constant.LOCATION_Y,
+							Constants.Face_Constant.WIDTH, Constants.Face_Constant.HEIGHT);
+					if(!"".equals(headLV)){
+						String[] str = headLV.split("X");
+						headVideoPlayBackPanel.setSize(new Dimension(Integer.parseInt(str[0]), Integer.parseInt(str[1])));
+					}
+					headVideoPlayBackPanel.start();
+					Webcam.getWebcams().get(i).open();
+					System.out.println(Webcam.getWebcams().get(i).isOpen());
+				}else{
+					if(!"".equals(headLV)){
+						headVideoPlayBackPanel.stop();
+						String[] str = headLV.split("X");
+						headVideoPlayBackPanel.setSize(new Dimension(Integer.parseInt(str[0]), Integer.parseInt(str[1])));
+						headVideoPlayBackPanel.start();
+					}
+				}
+				String noteWebcamString = noteWebcamCombo.getText();
+				if(!"".equals(noteWebcamString)){
+					int i = (Integer)noteWebcamCombo.getData(noteWebcamString);
+					noteVideoPlayBackPanel.stop();
+					noteVideoPlayBackPanel.dispose();
+					Webcam.getWebcams().get(i).close();
+					noteVideoPlayBackPanel = new VideoPlayBackPanel(getShell(), i);
+					noteVideoPlayBackPanel.setBounds(Constants.NOTE_Constant.LOCATION_X,
+							Constants.NOTE_Constant.LOCATION_Y,
+							Constants.NOTE_Constant.WIDTH, Constants.NOTE_Constant.HEIGHT);
+					if(!"".equals(noteLV)){
+						String[] str = noteLV.split("X");
+						noteVideoPlayBackPanel.setSize(new Dimension(Integer.parseInt(str[0]), Integer.parseInt(str[1])));
+					}
+					noteVideoPlayBackPanel.start();
+					Webcam.getWebcams().get(i).open();
+					System.out.println(Webcam.getWebcams().get(i).isOpen());
+					
+				}else{
+					if(!"".equals(noteLV)){
+						noteVideoPlayBackPanel.stop();
+						String[] str = noteLV.split("X");
+						noteVideoPlayBackPanel.setSize(new Dimension(Integer.parseInt(str[0]), Integer.parseInt(str[1])));
+						noteVideoPlayBackPanel.start();
+					}
+				}
+				getShell().setVisible(true);
 				ctf.getParent().dispose();
 			}
 		});

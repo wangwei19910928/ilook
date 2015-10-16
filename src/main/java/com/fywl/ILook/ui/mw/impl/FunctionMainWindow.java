@@ -1,5 +1,7 @@
 package com.fywl.ILook.ui.mw.impl;
 
+import java.awt.Dimension;
+
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.SelectionAdapter;
 import org.eclipse.swt.events.SelectionEvent;
@@ -19,7 +21,6 @@ import com.fywl.ILook.ui.components.MyLabel;
 import com.fywl.ILook.ui.components.ScreenPlayBackPanel;
 import com.fywl.ILook.ui.components.VideoPlayBackPanel;
 import com.fywl.ILook.ui.components.VideoRecorder;
-import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.components.panel.impl.TitlePanel;
 import com.fywl.ILook.ui.components.panel.impl.ToolPanel;
 import com.fywl.ILook.ui.mw.MainWindow;
@@ -33,11 +34,9 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	private VideoPlayBackPanel faceVideoPlayback = new VideoPlayBackPanel(shell,  0);
 
-	private VideoPlayBackPanel otherVideoPlayback = new VideoPlayBackPanel(shell,  1);
+	private VideoPlayBackPanel otherVideoPlayback = new VideoPlayBackPanel(shell, 1);
 
 	private VideoRecorder recorder;
-	
-	private InfoBean ib;
 
 	// 出事最小化到系统托盘的监听
 	private Tray tray;
@@ -46,12 +45,11 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		super();
 	}
 
-	public FunctionMainWindow(InfoBean ib,RecordConfig config) {
+	public FunctionMainWindow(RecordConfig config) {
 		this();
-		this.ib = ib;
 		this.config = config;
 		recorder = new VideoRecorder(config);
-
+System.out.println(22);
 		init();
 	}
 
@@ -100,6 +98,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 			otherVideoPlayback.stop();
 		}
 		shell.dispose();
+		System.out.println(1111);
 	}
 
 	// 出事最小化到系统托盘的监听
@@ -132,7 +131,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	// 初始化顶部logo、标题、最小化和关闭按钮
 	private void initTitlePanel() {
-		Panel titlePanel = new TitlePanel(this, shell, SWT.NONE, recorder);
+		TitlePanel titlePanel = new TitlePanel(this, shell, SWT.NONE, recorder);
 		titlePanel.setLocation(Constants.TITLE_PANEL_Constant.LOCATION[0],
 				Constants.TITLE_PANEL_Constant.LOCATION[1]);
 		titlePanel.setSize(Constants.TITLE_PANEL_Constant.LOCATION[2],
@@ -146,6 +145,8 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 //				.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
 //		title.addMouseListener(listener);
 //		title.addMouseMoveListener(listener);
+		titlePanel.setHeadVideoPlayBackPanel(faceVideoPlayback);
+		titlePanel.setNoteVideoPlayBackPanel(otherVideoPlayback);
 	}
 
 	// 初始化脸部摄像头
@@ -153,6 +154,10 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		faceVideoPlayback.setBounds(Constants.Face_Constant.LOCATION_X,
 				Constants.Face_Constant.LOCATION_Y,
 				Constants.Face_Constant.WIDTH, Constants.Face_Constant.HEIGHT);
+		Dimension head = config.getHead();
+		if(null != head){
+			faceVideoPlayback.setSize(head);
+		}
 		faceVideoPlayback.start();
 	}
 
@@ -175,6 +180,10 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		otherVideoPlayback.setBounds(Constants.NOTE_Constant.LOCATION_X,
 				Constants.NOTE_Constant.LOCATION_Y,
 				Constants.NOTE_Constant.WIDTH, Constants.NOTE_Constant.HEIGHT);
+		Dimension note = config.getNote();
+		if(null != note){
+			otherVideoPlayback.setSize(note);
+		}
 		otherVideoPlayback.start();
 	}
 
@@ -203,7 +212,8 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 				info.getDisplay(),
 				info.getClass().getResourceAsStream(
 						Constants.INFO_LABEL_Constant.ICON_URL)));
-
+		
+		InfoBean ib = config.getIb();
 		new MyLabel(info, SWT.NONE, ib.getSchool(),
 				Constants.INFO_LABEL_Constant.SCHOOL).setForeground(SWTResourceManager.getColor(SWT.COLOR_WHITE));
 		new MyLabel(info, SWT.NONE, ib.getName(),
@@ -256,7 +266,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 
 	// 初始化底部工具条
 	private void initToolPanel() {
-		Panel toolPanel = new ToolPanel(this, shell, SWT.NONE, recorder);
+		ToolPanel toolPanel = new ToolPanel(this, shell, SWT.NONE, recorder);
 		toolPanel.setLocation(Constants.TOOL_PANEL_Constant.LOCATION[0],
 				Constants.TOOL_PANEL_Constant.LOCATION[1]);
 		toolPanel.setSize(Constants.TOOL_PANEL_Constant.LOCATION[2],

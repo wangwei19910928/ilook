@@ -362,7 +362,7 @@ class MediaReader implements Runnable {
 				}
 			}
 			
-			String[] water = {"","我的水印","10","255","3"};//图片路劲，文字，大小，颜色，位置
+			String[] water = {"","","10","255","3"};//图片路劲，文字，大小，颜色，位置
 			String framerate = null;
 			if(null != properties){
 				String waterImg = properties.getProperty("water_img");
@@ -462,17 +462,17 @@ class MediaReader implements Runnable {
 		smp.put(audioBuf, 0, 0, nBytesRead);
 		smp.setComplete(true, numSample, (int) format.getSampleRate(), 1,
 				IAudioSamples.Format.FMT_S16, line.getMicrosecondPosition());
-//		while(t1<line.getMicrosecondPosition()){
-//			if(null != g){
-////				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
-//				drawWater(g, water, img);
-//			}
-//			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
-//			t1 += frameCount;
-//		}
-//		t1 += 15000;
-//		t1 += 45000;
-		writer.encodeVideo(0, frame);
+		while(t1<line.getMicrosecondPosition()){
+			if(null != g){
+//				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
+				drawWater(g, water, img);
+			}
+			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
+			t1 += frameCount;
+			System.out.println(frameCount);
+		}
+//		t1 += 50000;
+//		writer.encodeVideo(0, frame);
 		writer.encodeAudio(1, smp);
 	}
 

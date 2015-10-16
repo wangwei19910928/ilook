@@ -289,80 +289,59 @@ public class LoginMainWindow extends MainWindow implements Closer {
 				final String email = text.getText();
 				final String pass = text_1.getText();
 				// 登录
-				String str = HttpRequest.sendGet(
+				final String str = HttpRequest.sendGet(
 						Constants.LOGIN_HEAD_Constant.HTTP_LOGIN_URL,
 						"email=" + email + "&password="
-								+ pass + "&code=" + MyUtils.getLocalMac());
+								+ pass + "&code=" + MyUtils.getMotherboardSN()+MyUtils.getCpuCode());
 				//{"status":"success","user":"fasdf,25,王强,数学"}
 System.out.println(str); 
 
 				// 成功
 				if (str.contains("\"status\":\"success\"")) {
-					// 保存用户信息到本地
-					Properties properties = new Properties();
-					properties.setProperty("username", text.getText());
-					properties.setProperty("openSoftwareAutoLoginFlag",
-							button.getSelection() + "");
-					DESCrypt des = new DESCrypt();// 实例化一个对像
-					String strEnc = des.getEncString(text_1.getText());// 加密字符串,返回String的密文
-					properties.setProperty("password", strEnc);
-					PropertyUtil.setValue(properties, sFile);
-
-					tray.dispose();
-					shell.dispose();
-					InfoBean ib = new InfoBean();
-					
-					String[] infoArr = str.substring(str.indexOf("user\":\"")+7,str.lastIndexOf("\"")).split(",");
-					ib.setName(infoArr[2]);
-					ib.setSchool(infoArr[0]);
-					ib.setTrainAge(infoArr[1]);
-					ib.setType(infoArr[3]);
-
-					// 打开网站
-					FileInputStream fis;
-					try {
-						fis = new FileInputStream(sFile);
-						properties.load(fis);
-						fis.close();
-					} catch (FileNotFoundException e1) {
-						// TODO Auto-generated catch block
-						e1.printStackTrace();
-					} catch (IOException e) {
-						// TODO Auto-generated catch block
-						e.printStackTrace();
+					//返回值
+					final String[] infoArr = str.substring(str.indexOf("user\":\"")+7,str.lastIndexOf("\"")).split(",");
+					String dayStr = infoArr[5];
+					if("".equals(dayStr)){
+						login(infoArr);
+					}else{
+						//处理30天内到期提醒
+						Composite parentC = new Composite(shell, SWT.NONE);
+						parentC.setBounds(0, 130, Constants.Shell_Constant.WIDTH, Constants.Shell_Constant.HEIGHT-30);
+						Label l1 = new Label(parentC, SWT.NONE);
+//						l1.setText("您的使用时间还剩 "+ Integer.parseInt(dayStr) +"天");
+						l1.setBounds(180, 50, 300, 30);
+						l1.setFont(SWTResourceManager.getFont(
+								".Helvetica Neue DeskInterface", 16, SWT.BOLD));
+						Label l2 = new Label(parentC, SWT.NONE);
+						l2.setText("为了不影响您的正常使用，请及时续费");
+						l2.setBounds(80, 100, 400, 30);
+						l2.setFont(SWTResourceManager.getFont(
+								".Helvetica Neue DeskInterface", 16, SWT.BOLD));
+						Button queding = new Button(parentC, SWT.BORDER | SWT.FLAT);
+						queding.setFont(SWTResourceManager.getFont(
+								".Helvetica Neue DeskInterface", 12, SWT.BOLD));
+						queding.setBounds(Constants.LOGIN_HEAD_Constant.LOGIN_LOCATION[0],
+								Constants.LOGIN_HEAD_Constant.LOGIN_LOCATION[1],
+								Constants.LOGIN_HEAD_Constant.LOGIN_LOCATION[2],
+								Constants.LOGIN_HEAD_Constant.LOGIN_LOCATION[3]);
+						queding.setText("登录");
+						queding.addListener(SWT.MouseUp, new Listener() {
+							
+							@Override
+							public void handleEvent(Event event) {
+								// TODO Auto-generated method stub
+								login(infoArr);
+							}
+						});
 					}
-//					String openWebsiteAfterLoginFlag = properties
-//							.getProperty("openWebsiteAfterLoginFlag");
-//					if ("true".equals(openWebsiteAfterLoginFlag)) {
-//						try {
-//							Runtime.getRuntime().exec(
-//									"rundll32 url.dll,FileProtocolHandler http://"
-//											+ Constants.Shell_Constant.WEBSITE);
-//						} catch (IOException e) {
-//							// TODO Auto-generated catch block
-//							e.printStackTrace();
-//						}
-//					}
-
-					RecordConfig rc = RecordConfig.get();
-					rc.setSingleRecording(false);
-					rc.setVideoSize(new Dimension(
-							Constants.Shell_Constant.DIMENSION[0],
-							Constants.Shell_Constant.DIMENSION[1]));
-					// 是否是单瓶录制
-					String isSingleRecording = properties
-							.getProperty("dplzFlag");
-					if (null != isSingleRecording
-							&& isSingleRecording.contains("true")) {
-						// 获取屏幕分辨率
-						Dimension d = Toolkit.getDefaultToolkit()
-								.getScreenSize();
-						rc.setSingleRecording(true);
-						rc.setVideoSize(d);
-					}
-
-					new FunctionMainWindow(ib, rc);
+						
 				} else {
+					if(str.contains("\"close\":true")){
+						messageLabel.setText("用户已被关闭，如有疑问联系管理员");
+					}
+					if(str.contains("\"code\":true")){
+						messageLabel.setText("此账户不允许在这台电脑登录");
+					}
 					// cp1.setVisible(false);
 					messageLabel.setVisible(true);
 					// pb.moveBelow(null);
@@ -370,6 +349,103 @@ System.out.println(str);
 				}
 			}
 		});
+	}
+	
+	
+	private void login(String[] infoArr){
+		// 保存用户信息到本地
+		Properties properties = new Properties();
+		properties.setProperty("username", text.getText());
+		properties.setProperty("openSoftwareAutoLoginFlag",
+				button.getSelection() + "");
+		DESCrypt des = new DESCrypt();// 实例化一个对像
+		String strEnc = des.getEncString(text_1.getText());// 加密字符串,返回String的密文
+		properties.setProperty("password", strEnc);
+		PropertyUtil.setValue(properties, sFile);
+		
+		tray.dispose();
+		shell.dispose();
+		InfoBean ib = new InfoBean();
+		
+		
+		ib.setName(infoArr[2]);
+		ib.setSchool(infoArr[0]);
+		ib.setTrainAge(infoArr[1]);
+		ib.setType(infoArr[3]);
+		ib.setUploadFlag(false);
+		if("Upload".equals(infoArr[4])){
+			ib.setUploadFlag(true);
+		}
+		
+//	// 打开网站
+//	FileInputStream fis;
+//	try {
+//		fis = new FileInputStream(sFile);
+//		properties.load(fis);
+//		fis.close();
+//	} catch (FileNotFoundException e1) {
+//		// TODO Auto-generated catch block
+//		e1.printStackTrace();
+//	} catch (IOException e) {
+//		// TODO Auto-generated catch block
+//		e.printStackTrace();
+//	}
+//	String openWebsiteAfterLoginFlag = properties
+//			.getProperty("openWebsiteAfterLoginFlag");
+//	if ("true".equals(openWebsiteAfterLoginFlag)) {
+//		try {
+//			Runtime.getRuntime().exec(
+//					"rundll32 url.dll,FileProtocolHandler http://"
+//							+ Constants.Shell_Constant.WEBSITE);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
+//	}
+		File file = new File("user.properties");
+		FileInputStream fis;
+		try {
+			if (file.exists()) {
+				properties = new Properties();
+				fis = new FileInputStream(file);
+				properties.load(fis);
+			}
+		} catch (FileNotFoundException e1) {
+			e1.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+		
+		RecordConfig rc = RecordConfig.get();
+		rc.setSingleRecording(false);
+		rc.setVideoSize(new Dimension(
+				Constants.Shell_Constant.DIMENSION[0],
+				Constants.Shell_Constant.DIMENSION[1]));
+		// 是否是单瓶录制
+		String isSingleRecording = properties
+				.getProperty("dplzFlag");
+		if (null != isSingleRecording
+				&& isSingleRecording.contains("true")) {
+			// 获取屏幕分辨率
+			Dimension d = Toolkit.getDefaultToolkit()
+					.getScreenSize();
+			rc.setSingleRecording(true);
+			rc.setVideoSize(d);
+		}
+		String headLV = properties.getProperty("headLV");
+		String noteLV = properties.getProperty("noteLV");
+		System.out.println(headLV);
+		System.out.println(noteLV);
+		if(null != headLV && !"".equals(headLV)){
+			String[] strLv = headLV.split("X");
+			rc.setHead(new Dimension(Integer.parseInt(strLv[0]), Integer.parseInt(strLv[1])));
+		}
+		if(null != noteLV && !"".equals(noteLV)){
+			String[] strLv = noteLV.split("X");
+			rc.setNote(new Dimension(Integer.parseInt(strLv[0]), Integer.parseInt(strLv[1])));
+		}
+		rc.setIb(ib);
+		new FunctionMainWindow(rc);
 	}
 
 	@Override

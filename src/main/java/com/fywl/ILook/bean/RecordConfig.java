@@ -53,7 +53,13 @@ public class RecordConfig {
 	private boolean changeScreen;
 	//有切换画面的动作
 	private boolean changeFlag = false;
-
+	//头部摄像头尺寸
+	private Dimension head;
+	//笔记摄像头尺寸
+	private Dimension note;
+	//个人信息
+	private InfoBean ib;
+	
 	private RecordConfig() {
 
 	}
@@ -236,6 +242,30 @@ public class RecordConfig {
 
 	public void setChangeScreen(boolean changeScreen) {
 		this.changeScreen = changeScreen;
+	}
+
+	public Dimension getHead() {
+		return head;
+	}
+
+	public void setHead(Dimension head) {
+		this.head = head;
+	}
+
+	public Dimension getNote() {
+		return note;
+	}
+
+	public void setNote(Dimension note) {
+		this.note = note;
+	}
+
+	public InfoBean getIb() {
+		return ib;
+	}
+
+	public void setIb(InfoBean ib) {
+		this.ib = ib;
 	}
 	
 }

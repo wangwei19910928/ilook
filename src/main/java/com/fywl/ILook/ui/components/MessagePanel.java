@@ -66,8 +66,9 @@ public class MessagePanel extends Composite implements Closer {
 		new MyLabel(this, SWT.NONE, thirdText, thirdLocation);
 		
 		leftLabel.setBounds(40, 180, 150, 30);
-		
-		rightLabel.setBounds(220, 180, 100, 30);
+		if(null != rightLabel){
+			rightLabel.setBounds(220, 180, 100, 30);
+		}
 	}
 
 	public void setLeftLabel(Label leftLabel) {

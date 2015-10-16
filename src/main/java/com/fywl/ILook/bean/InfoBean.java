@@ -10,6 +10,8 @@ public class InfoBean {
 	private String type;
 	
 	private String trainAge;
+	
+	private boolean uploadFlag;
 
 	public String getSchool() {
 		return school;
@@ -41,6 +43,14 @@ public class InfoBean {
 
 	public void setTrainAge(String trainAge) {
 		this.trainAge = trainAge;
+	}
+
+	public boolean isUploadFlag() {
+		return uploadFlag;
+	}
+
+	public void setUploadFlag(boolean uploadFlag) {
+		this.uploadFlag = uploadFlag;
 	}
 
 }

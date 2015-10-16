@@ -11,7 +11,7 @@ public class Constants {
 		// 背景颜色
 		public int[] BACKGROUND = { 60, 131, 209 };
 		//网站主页
-		public String WEBSITE = "www.baidu.com";
+		public String WEBSITE = "";
 		public int[] DIMENSION ={1024, 768};
 	}
 
@@ -151,14 +151,15 @@ public class Constants {
 		// 登录按钮位置
 		public int[] LOGIN_LOCATION = { 192, 170, 200, 40 };
 		// 登录请求url
-		public String HTTP_LOGIN_URL = "http://192.168.18.4:8080/check";
+		public String HTTP_LOGIN_URL = "http://192.168.18.6:8080/check";
+//		public String HTTP_LOGIN_URL = "http://114.215.123.52:8888/MicroClassWeb/check";
 	}
 
 	// 上传时候的常量
 	public interface UPLOAD_Constant {
 		public String[] TYPE = { "数学", "语文", "英语", "物理", "化学" };
 		public String[] KEY = { "1", "2", "3", "4", "5" };
-		public String HTTP_UPLOAD_URL = "http://192.168.18.4:8080/upload/f_upload";
+		public String HTTP_UPLOAD_URL = "http://114.215.123.52:8888/MicroClassWeb/upload/f_upload";
 	}
 
 	// 设置部分常量

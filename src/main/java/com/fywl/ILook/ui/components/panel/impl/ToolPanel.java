@@ -14,6 +14,8 @@ import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.Listener;
 
 import com.fywl.ILook.bean.Constants;
+import com.fywl.ILook.bean.InfoBean;
+import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.MessagePanel;
 import com.fywl.ILook.ui.components.MyLabel;
@@ -147,7 +149,10 @@ public class ToolPanel extends Panel {
 							zz.dispose();
 						}
 					});
-					mp.setRightLabel(label);
+					InfoBean ib = RecordConfig.get().getIb();
+					if(ib.isUploadFlag()){
+						mp.setRightLabel(label);
+					}
 					//左侧的打开文件夹按钮
 					Label llabel = new MyLabel(mp, SWT.NONE, "", location);
 					Image lImage = ImageUtil.getInstance().getImage(
@@ -188,7 +193,7 @@ public class ToolPanel extends Panel {
 					int time = recorder.getTime() / 10;
 					mp.init("/images/saveflag.png", "微课已成功保存", "总时长" + time / 3600
 							+ ":" + time / 60 + ":" + time % 60,
-							"点击上传添加相应信息即可上传");
+							" ");
 				}
 			}
 		});
@@ -272,13 +277,15 @@ public class ToolPanel extends Panel {
 	}
 
 	private void refresh(final Label minuteLabel, final Label secondLabel) {
-		getDisplay().timerExec(800, new Runnable() {
-			public void run() {
-				int count = recorder.getTime() / 10;
-				minuteLabel.setText(count / 60 + "");
-				secondLabel.setText(count % 60 + "");
-				getDisplay().timerExec(800, this);
-			}
-		});
+		if(null != getDisplay()){
+			getDisplay().timerExec(800, new Runnable() {
+				public void run() {
+					int count = recorder.getTime() / 10;
+					minuteLabel.setText(count / 60 + "");
+					secondLabel.setText(count % 60 + "");
+					getDisplay().timerExec(800, this);
+				}
+			});
+		}
 	}
 }
