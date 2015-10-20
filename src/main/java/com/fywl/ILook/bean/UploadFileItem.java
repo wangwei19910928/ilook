@@ -4,6 +4,7 @@ import java.io.Serializable;
 
  /**
   *  一个POJO。用于保存上传文件的相关信息
+  * 测试123冲突
   * @author Administrator
   *
   */
@@ -39,4 +40,3 @@ public class UploadFileItem implements Serializable {
 		this.fileName = fileName;
 	}
 }
-
