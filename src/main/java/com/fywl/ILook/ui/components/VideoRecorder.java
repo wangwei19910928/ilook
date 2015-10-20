@@ -408,7 +408,6 @@ class MediaReader implements Runnable {
 				}
 				Thread.sleep(500);
 			}
-			System.out.println(i);
 		} catch (Exception e) {
 			e.printStackTrace();
 		} finally {
@@ -469,7 +468,6 @@ class MediaReader implements Runnable {
 			}
 			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
 			t1 += frameCount;
-			System.out.println(frameCount);
 		}
 //		t1 += 50000;
 //		writer.encodeVideo(0, frame);
@@ -497,19 +495,16 @@ class MediaReader implements Runnable {
 			// 单瓶切换
 			if (config.isSingleRecording()) {
 				if (config.isFaceRecording()) {
-					System.out.println("录制脸");
 					Webcam.getWebcams().get(1)
 							.removeWebcamListener(singleScreenVideo);
 					Webcam.getWebcams().get(0)
 							.addWebcamListener(singleScreenVideo);
 				} else if (config.isNoteRecording()) {
-					System.out.println("录制笔记");
 					Webcam.getWebcams().get(0)
 							.removeWebcamListener(singleScreenVideo);
 					Webcam.getWebcams().get(1)
 							.addWebcamListener(singleScreenVideo);
 				} else if (config.isScreenRecording()) {
-					System.out.println("录制屏幕");
 					Webcam.getWebcams().get(0)
 							.removeWebcamListener(singleScreenVideo);
 					Webcam.getWebcams().get(1)
@@ -680,7 +675,6 @@ class MediaReader implements Runnable {
 	  	      audioCodec, channelCount, sampleRate);
 	    IStream stream = container.getStream(audioStreamIndex);
 	    int sampleCount = stream.getStreamCoder().getDefaultAudioFrameSize();
-System.out.println(stream.toString());
 	    // create a place for audio samples and video pictures
 
 	    IAudioSamples samples = IAudioSamples.make(sampleCount, channelCount);
@@ -731,17 +725,13 @@ System.out.println(stream.toString());
 	            Global.DEFAULT_TIME_UNIT);
 	      
 	        videoTime += deltaTime;
-	        System.out.println("-----------------");
 	      }
-	      System.out.println("----");
 
 	      // generate audio
 	      
 	      generator.fillNextSamples(samples, sampleCount);
 	      writer.encodeAudio(audioStreamIndex, samples);
 	      totalSamples += samples.getNumSamples();
-	      
-	      System.out.println(i++);
 	    }
 
 	    // close the writer
@@ -800,8 +790,6 @@ class CacheImage implements Runnable{
 					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
-				System.out.println("cache=="+bq.size());
-					
 			}
 		}
 	}
@@ -811,7 +799,6 @@ class CacheImage implements Runnable{
 				(int) 900, BufferedImage.TYPE_3BYTE_BGR);
 //		executor.submit(this);
 		g = combined.getGraphics();
-		System.out.println(g);
 		Webcam.getWebcams().get(1)
 		.addWebcamListener(new VideoListener(g, 0, 0,
 				1200, 720));
@@ -930,8 +917,6 @@ class MediaWriter implements Runnable{
 		      generator.fillNextSamples(samples, sampleCount);
 		      writer.encodeAudio(audioStreamIndex, samples);
 		      totalSamples += samples.getNumSamples();
-		      
-		      System.out.println("hecheng=="+ i++);
 		    }
 		    
 		    if(3600 == i)
@@ -941,7 +926,6 @@ class MediaWriter implements Runnable{
 		    // close the writer
 
 		    writer.close();
-		    System.out.println("-------------------------------------");
 		    try {
 				Thread.sleep(5000);
 			} catch (InterruptedException e) {

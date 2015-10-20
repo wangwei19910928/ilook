@@ -54,11 +54,8 @@ public class VideoListener implements WebcamListener {
 	@Override
 	public void webcamImageObtained(WebcamEvent we) {
 		if (g != null) {
-			long b = System.currentTimeMillis();
 			BufferedImage image = ConverterFactory.convertToType(we.getImage(), BufferedImage.TYPE_3BYTE_BGR);
 			g.drawImage(image, x, y, width, height, null);
-			long e = System.currentTimeMillis();
-			System.out.println("============================"+(e-start));
 //			g.drawImage(image, 0, 0, width, height, width, 0, 0, height, null);
 //			Graphics2D g2d = (Graphics2D)g;  
 //	        g2d.rotate(180,width/2,height/2);  

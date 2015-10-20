@@ -151,8 +151,8 @@ public class Constants {
 		// 登录按钮位置
 		public int[] LOGIN_LOCATION = { 192, 170, 200, 40 };
 		// 登录请求url
-		public String HTTP_LOGIN_URL = "http://192.168.18.6:8080/check";
-//		public String HTTP_LOGIN_URL = "http://114.215.123.52:8888/MicroClassWeb/check";
+//		public String HTTP_LOGIN_URL = "http://192.168.18.6:8080/check";
+		public String HTTP_LOGIN_URL = "http://114.215.123.52:8888/MicroClassWeb/check";
 	}
 
 	// 上传时候的常量
