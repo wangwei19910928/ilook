@@ -49,7 +49,6 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		this();
 		this.config = config;
 		recorder = new VideoRecorder(config);
-System.out.println(22);
 		init();
 	}
 
@@ -98,7 +97,6 @@ System.out.println(22);
 			otherVideoPlayback.stop();
 		}
 		shell.dispose();
-		System.out.println(1111);
 	}
 
 	// 出事最小化到系统托盘的监听

@@ -9,6 +9,7 @@ import org.eclipse.swt.SWT;
 import org.eclipse.swt.awt.SWT_AWT;
 import org.eclipse.swt.widgets.Composite;
 
+import com.fywl.ILook.bean.RecordConfig;
 import com.github.sarxos.webcam.Webcam;
 import com.github.sarxos.webcam.WebcamPanel;
 import com.github.sarxos.webcam.WebcamResolution;
@@ -33,7 +34,33 @@ public class VideoPlayBackPanel extends Composite {
 	public VideoPlayBackPanel(Composite parent,
 			int index) {
 		super(parent, SWT.EMBEDDED);
-		Webcam wb = Webcam.getWebcams().get(index);
+		//摄像头初始化判断
+		Webcam wb = null;
+//		Webcam wb = Webcam.getWebcams().get(index);
+		int maxIndex = Webcam.getWebcams().size();
+		switch (index) {
+		//脸部摄像头
+		case 0:
+			Integer i = RecordConfig.get().getHeadWebcamIndex();
+			if(null != i){
+				if(i<=maxIndex){
+					wb = Webcam.getWebcams().get(i);
+				}
+			}
+			break;
+		case 1:
+			Integer i1 = RecordConfig.get().getNoteWebcamIndex();
+			if(null != i1){
+				if(i1<=maxIndex){
+					wb = Webcam.getWebcams().get(i1);
+				}
+			}
+			break;
+
+		default:
+			break;
+		}
+//		Webcam wb = Webcam.getWebcams().get(index);
 		if (null != wb) {
 			webcam = wb;
 			Dimension[] nonStandardResolutions = new Dimension[] {
@@ -65,7 +92,6 @@ public class VideoPlayBackPanel extends Composite {
 	public void start() {
 		if (webcam != null) {
 			webcam.setViewSize(size);
-			System.out.println(webcam.getViewSize());
 			root.getContentPane().removeAll();
 			panel = new WebcamPanel(webcam, webcam.getViewSize(), false);
 			panel.setFPSDisplayed(true);
@@ -86,7 +112,7 @@ public class VideoPlayBackPanel extends Composite {
 //		}
 	}
 
-	public void stop() {
+	public void stop() { 
 		if (panel != null) {
 			frame.remove(panel);
 			panel.stop();

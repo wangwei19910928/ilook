@@ -57,6 +57,10 @@ public class RecordConfig {
 	private Dimension head;
 	//笔记摄像头尺寸
 	private Dimension note;
+	//头部摄像头index
+	private Integer headWebcamIndex;
+	//笔记摄像头index
+	private Integer noteWebcamIndex;
 	//个人信息
 	private InfoBean ib;
 	
@@ -266,6 +270,22 @@ public class RecordConfig {
 
 	public void setIb(InfoBean ib) {
 		this.ib = ib;
+	}
+
+	public Integer getHeadWebcamIndex() {
+		return headWebcamIndex;
+	}
+
+	public void setHeadWebcamIndex(int headWebcamIndex) {
+		this.headWebcamIndex = headWebcamIndex;
+	}
+
+	public Integer getNoteWebcamIndex() {
+		return noteWebcamIndex;
+	}
+
+	public void setNoteWebcamIndex(int noteWebcamIndex) {
+		this.noteWebcamIndex = noteWebcamIndex;
 	}
 	
 }

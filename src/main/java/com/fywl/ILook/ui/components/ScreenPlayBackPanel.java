@@ -111,10 +111,8 @@ public class ScreenPlayBackPanel extends Canvas {
 //		if (config.isSingleRecording()) {
 			// 录制脸部摄像头
 			if (config.isChangeFace()) {
-				System.out.println("changeface");
 				// 控制录制画面 true代表正在录制的画面
 				if (config.isNoteRecording()|| config.isScreenRecording()) {
-					System.out.println("you gai dong");
 					//谁在录制中跟谁换，如果自己在录制中则不换
 					if(config.isScreenRecording()){
 						Rectangle r = getBounds();

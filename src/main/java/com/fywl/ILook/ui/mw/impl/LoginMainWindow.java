@@ -434,8 +434,8 @@ System.out.println(str);
 		}
 		String headLV = properties.getProperty("headLV");
 		String noteLV = properties.getProperty("noteLV");
-		System.out.println(headLV);
-		System.out.println(noteLV);
+		String headWebcamIndex = properties.getProperty("headWebcamIndex");
+		String noteWebcamIndex = properties.getProperty("noteWebcamIndex");
 		if(null != headLV && !"".equals(headLV)){
 			String[] strLv = headLV.split("X");
 			rc.setHead(new Dimension(Integer.parseInt(strLv[0]), Integer.parseInt(strLv[1])));
@@ -443,6 +443,14 @@ System.out.println(str);
 		if(null != noteLV && !"".equals(noteLV)){
 			String[] strLv = noteLV.split("X");
 			rc.setNote(new Dimension(Integer.parseInt(strLv[0]), Integer.parseInt(strLv[1])));
+		}
+		rc.setHeadWebcamIndex(0);
+		if(null != headWebcamIndex && !"".equals("headWebcamIndex")){
+			rc.setHeadWebcamIndex(Integer.parseInt(headWebcamIndex));
+		}
+		rc.setNoteWebcamIndex(1);
+		if(null != noteWebcamIndex && !"".equals("noteWebcamIndex")){
+			rc.setNoteWebcamIndex(Integer.parseInt(noteWebcamIndex));
 		}
 		rc.setIb(ib);
 		new FunctionMainWindow(rc);
