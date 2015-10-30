@@ -27,25 +27,17 @@ import org.eclipse.wb.swt.SWTResourceManager;
 
 import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.bean.RecordConfig;
-import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.utils.ImageUtil;
 import com.fywl.ILook.utils.PropertyUtil;
 import com.fywl.ILook.utils.RegeditTool;
 import com.github.sarxos.webcam.Webcam;
 
 public class SetupPanel extends Composite{
-	private Closer closer;
-	private VideoPlayBackPanel headVideoPlayBackPanel;
-	
-	private VideoPlayBackPanel noteVideoPlayBackPanel;
 	//摄像头是否有改变的标志
 	private boolean changeFlag = false;
 
-	public SetupPanel(Closer closer,Composite parent, int style,VideoPlayBackPanel face,VideoPlayBackPanel note) {
+	public SetupPanel(Composite parent, int style) {
 		super(parent, style);
-		this.closer = closer;
-		this.headVideoPlayBackPanel=face;
-		this.noteVideoPlayBackPanel=note;
 		init1();
 	}
 	
@@ -105,7 +97,7 @@ public class SetupPanel extends Composite{
 		final Combo zlcombo = new Combo(setupCP, SWT.READ_ONLY);
 		zlcombo.setBounds(200, 90, 80, 30);
 		zlcombo.setItems(Constants.SETUP_Constant.frame_rate);
-		String frameRate = (null == properties.getProperty("frameRate") || "".equals(properties.getProperty("frameRate")) ? "50000":properties.getProperty("frameRate"));
+		String frameRate = (null == properties.getProperty("frameRate") || "".equals(properties.getProperty("frameRate")) ? "100000":properties.getProperty("frameRate"));
 		for (int i = 0; i < Constants.SETUP_Constant.frame_rate.length; i++) {
 			if(Constants.SETUP_Constant.frame_rate_value[i].equals(frameRate)){
 				zlcombo.setText(frameRate);
@@ -512,15 +504,17 @@ public class SetupPanel extends Composite{
 				properties.setProperty("water_text_color", water_text_color.toString());
 				properties.setProperty("water_location", water_location.toString());
 				//摄像头
-				String headWebcamString = headWebcamCombo.getText();
-				String noteWebcamString = noteWebcamCombo.getText();
-				if(!"".equals(headWebcamString)){
-					int i = (Integer)headWebcamCombo.getData(headWebcamString);
-					properties.setProperty("headWebcamIndex", i+"");
-				}
-				if(!"".equals(noteWebcamString)){
-					int i = (Integer)noteWebcamCombo.getData(noteWebcamString);
-					properties.setProperty("noteWebcamIndex", i+"");
+				String headWebcamString = (null == headWebcamCombo.getText() ? "" : headWebcamCombo.getText());
+				String noteWebcamString = (null == noteWebcamCombo.getText() ? "" : noteWebcamCombo.getText());
+				if(!headWebcamString.equals(noteWebcamString)){
+					if(!"".equals(headWebcamString)){
+						int i = (Integer)headWebcamCombo.getData(headWebcamString);
+						properties.setProperty("headWebcamIndex", i+"");
+					}
+					if(!"".equals(noteWebcamString)){
+						int i = (Integer)noteWebcamCombo.getData(noteWebcamString);
+						properties.setProperty("noteWebcamIndex", i+"");
+					}
 				}
 				//分辨率
 				if(!"".equals(headLV)){
@@ -551,6 +545,9 @@ public class SetupPanel extends Composite{
 					// 标题文字
 					Label l2 = new Label(title, SWT.NONE);
 					l2.setText("摄像头设置重启后生效");
+					if(headWebcamString.equals(noteWebcamString)){
+						l2.setText("摄像头不能设置同一个");
+					}
 					l2.setBounds(0, 0, 300, 30);
 					l2.setFont(SWTResourceManager.getFont(
 							".Helvetica Neue DeskInterface", 16, SWT.BOLD));
@@ -658,6 +655,11 @@ public class SetupPanel extends Composite{
 //					}
 //				}
 //				getShell().setVisible(true);
+				if(changeFlag){
+					if(headWebcamString.equals(noteWebcamString)){
+						return;
+					}
+				}
 				ctf.getParent().dispose();
 //				closer.shutDown();
 //				System.exit(0);

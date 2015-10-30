@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="utf-8"?>
 <jnlp spec="1.0+" codebase="http://192.168.18.110:8080/web/" href="$outputFile">
   <information>
-    <title>MicroVideo</title>
+    <title>ilook</title>
     <vendor>Argus Software</vendor>
     <homepage>http://www.argussoftware.com</homepage>
     <description>web</description>
-	<icon href="http://114.215.123.52:8888/web/ico.png" kind="splash"/>
+    <icon href="http://192.168.18.110:8080/web/ico.gif"/>
+    <icon href="http://192.168.18.110:8080/web/ico.gif" kind="splash"/>
 	
     <offline-allowed/>
     <shortcut online="true">
@@ -20,7 +21,7 @@
   <update check="background" policy="prompt-update" />
   
   <resources>
-  	<j2se version="1.7+" initial-heap-size="512m" max-heap-size="512m"/>
+  	<j2se version="1.7+" initial-heap-size="512m" max-heap-size="512m" />
     <jar href="lib/ILook-0.0.1-SNAPSHOT.jar" main="true"/>
     <jar href="lib/webcam-capture-0.3.10.jar"/>
     <jar href="lib/bridj-0.6.2.jar"/>

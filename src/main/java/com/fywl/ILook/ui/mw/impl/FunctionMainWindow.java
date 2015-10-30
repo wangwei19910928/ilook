@@ -25,6 +25,7 @@ import com.fywl.ILook.ui.components.panel.impl.TitlePanel;
 import com.fywl.ILook.ui.components.panel.impl.ToolPanel;
 import com.fywl.ILook.ui.mw.MainWindow;
 import com.fywl.ILook.utils.ImageUtil;
+import com.github.sarxos.webcam.WebcamResolution;
 import com.melloware.jintellitype.HotkeyListener;
 import com.melloware.jintellitype.JIntellitype;
 
@@ -78,7 +79,7 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 		initInfoLaber();
 
 		initVideoPlayBackPanel();
-
+//
 		initOtherVideoPlayBackPanel();
 		
 		initScreenPanel();
@@ -143,8 +144,6 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 //				.getColor(Constants.TITLE_PANEL_Constant.TITLE_COLOR));
 //		title.addMouseListener(listener);
 //		title.addMouseMoveListener(listener);
-		titlePanel.setHeadVideoPlayBackPanel(faceVideoPlayback);
-		titlePanel.setNoteVideoPlayBackPanel(otherVideoPlayback);
 	}
 
 	// 初始化脸部摄像头
@@ -153,8 +152,8 @@ public class FunctionMainWindow extends MainWindow implements Closer {
 				Constants.Face_Constant.LOCATION_Y,
 				Constants.Face_Constant.WIDTH, Constants.Face_Constant.HEIGHT);
 		Dimension head = config.getHead();
+		faceVideoPlayback.setSize(WebcamResolution.QVGA.getSize());
 		if(null != head){
-			faceVideoPlayback.setSize(head);
 		}
 		faceVideoPlayback.start();
 	}

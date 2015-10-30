@@ -11,17 +11,12 @@ import com.fywl.ILook.bean.Constants;
 import com.fywl.ILook.inter.Closer;
 import com.fywl.ILook.ui.components.ImageButton;
 import com.fywl.ILook.ui.components.SetupPanel;
-import com.fywl.ILook.ui.components.VideoPlayBackPanel;
 import com.fywl.ILook.ui.components.VideoRecorder;
 import com.fywl.ILook.ui.components.panel.Panel;
 import com.fywl.ILook.ui.listener.MoveableListener;
 import com.fywl.ILook.utils.ImageUtil;
 
 public class TitlePanel extends Panel {
-	
-	private VideoPlayBackPanel headVideoPlayBackPanel;
-	
-	private VideoPlayBackPanel noteVideoPlayBackPanel;
 	
 	public TitlePanel(Closer closer, Composite parent, int style,
 			VideoRecorder recorder) {
@@ -95,26 +90,9 @@ public class TitlePanel extends Panel {
 		setupBtn.getButton().addListener(SWT.Selection, new Listener() {
 			@Override
 			public void handleEvent(Event event) {
-				SetupPanel sp = new SetupPanel(closer,parent.getShell(), SWT.NONE,headVideoPlayBackPanel,noteVideoPlayBackPanel);
+				SetupPanel sp = new SetupPanel(parent.getShell(), SWT.NONE);
 				sp.moveAbove(null);
 			}
 		});
 	}
-
-	public VideoPlayBackPanel getHeadVideoPlayBackPanel() {
-		return headVideoPlayBackPanel;
-	}
-
-	public void setHeadVideoPlayBackPanel(VideoPlayBackPanel headVideoPlayBackPanel) {
-		this.headVideoPlayBackPanel = headVideoPlayBackPanel;
-	}
-
-	public VideoPlayBackPanel getNoteVideoPlayBackPanel() {
-		return noteVideoPlayBackPanel;
-	}
-
-	public void setNoteVideoPlayBackPanel(VideoPlayBackPanel noteVideoPlayBackPanel) {
-		this.noteVideoPlayBackPanel = noteVideoPlayBackPanel;
-	}
-
 }

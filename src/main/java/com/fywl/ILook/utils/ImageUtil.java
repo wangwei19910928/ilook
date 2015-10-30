@@ -140,7 +140,13 @@ public class ImageUtil {
 							flag = true;
 						}
 //						 BufferedImage screen = capture(hWnd);
-						BufferedImage screen = capture(hWnd, flag);
+						BufferedImage screen = null;
+						try{
+							screen = capture(hWnd, flag);
+						}catch(Exception e){
+							System.out.println("ImageUtil line 147"+e);
+							e.printStackTrace();
+						}
 						if (screen != null) {
 							ScreenImage image = new ScreenImage(screen, rect);
 							if("Program Manager".equals(wText)){

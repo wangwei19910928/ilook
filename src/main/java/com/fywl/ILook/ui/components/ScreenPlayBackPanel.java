@@ -58,7 +58,7 @@ public class ScreenPlayBackPanel extends Canvas {
 	public void start() {
 //		capting = true;
 		final RecordConfig config = RecordConfig.get();
-		getDisplay().timerExec(5, new Runnable() {
+		getDisplay().timerExec(500, new Runnable() {
 			public void run() {
 
 				BufferedImage fullScreen = ImageUtil.getInstance()
@@ -81,7 +81,7 @@ public class ScreenPlayBackPanel extends Canvas {
 				 */
 				checkChange(config);
 
-				getDisplay().timerExec(5, this);
+				getDisplay().timerExec(500, this);
 			}
 		});
 		setVisible(true);

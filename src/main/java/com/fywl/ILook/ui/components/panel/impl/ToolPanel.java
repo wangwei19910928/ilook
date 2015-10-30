@@ -192,7 +192,7 @@ public class ToolPanel extends Panel {
 					mp.setLeftLabel(llabel);
 					int time = recorder.getTime() / 10;
 					mp.init("/images/saveflag.png", "微课已成功保存", "总时长" + time / 3600
-							+ ":" + time / 60 + ":" + time % 60,
+							+ ":" + (time / 60)%60+ ":" + time % 60,
 							" ");
 				}
 			}
@@ -278,12 +278,12 @@ public class ToolPanel extends Panel {
 
 	private void refresh(final Label minuteLabel, final Label secondLabel) {
 		if(null != getDisplay()){
-			getDisplay().timerExec(800, new Runnable() {
+			getDisplay().timerExec(500, new Runnable() {
 				public void run() {
 					int count = recorder.getTime() / 10;
 					minuteLabel.setText(count / 60 + "");
 					secondLabel.setText(count % 60 + "");
-					getDisplay().timerExec(800, this);
+					getDisplay().timerExec(500, this);
 				}
 			});
 		}

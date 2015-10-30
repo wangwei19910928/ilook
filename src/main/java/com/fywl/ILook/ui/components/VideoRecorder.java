@@ -19,7 +19,6 @@ import java.util.Properties;
 import java.util.concurrent.BlockingQueue;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.LinkedBlockingDeque;
 
 import javax.imageio.ImageIO;
 import javax.sound.sampled.AudioFormat;
@@ -33,6 +32,7 @@ import com.fywl.ILook.bean.RecordConfig;
 import com.fywl.ILook.ui.listener.VideoListener;
 import com.fywl.ILook.utils.ImageUtil;
 import com.github.sarxos.webcam.Webcam;
+import com.github.sarxos.webcam.WebcamListener;
 import com.github.sarxos.webcam.WebcamResolution;
 import com.xuggle.ferry.IBuffer;
 import com.xuggle.mediatool.IMediaWriter;
@@ -82,14 +82,11 @@ public class VideoRecorder implements ImageRecorder {
 		//初始化屏幕参数
 		ImageUtil.getInstance().initSizeAndHeight();
 		g = reader.start();
-//		ExecutorService executor = Executors.newFixedThreadPool(2);
-//		BlockingQueue<BufferedImage> bq = new LinkedBlockingDeque<>();
-////		new MediaWriter(bq).start();
-//		executor.submit(new MediaWriter(bq));
-//		CacheImage ci = new CacheImage(bq);
-//		g = ci.start();
-//		System.out.println("录制方式=" + config.isSingleRecording());
-//		executor.submit(ci);
+		
+//		Thread t1 = new Thread(new MakerVideo2());
+//		t1.start();
+//		Thread t2 = new Thread(new MakerVideo3());
+//		t2.start();
 	}
 
 	public void stop() {
@@ -162,11 +159,6 @@ class MediaReader implements Runnable {
 	
 	private Image img;
 
-	// // 记录切换按钮
-	// private Integer changeCount = 1;
-	// // 是否改变了切换按钮的状
-	// private Boolean changeFlag = false;
-
 	VideoListener otherVideo;
 
 	VideoListener faceVideo;
@@ -185,11 +177,6 @@ class MediaReader implements Runnable {
 
 	public MediaReader(RecordConfig config) {
 		this.config = config;
-		// if (config.isSingleRecording()) {
-		// videoSize = config.getVideoSize();
-		// }
-		// combined = new BufferedImage((int) videoSize.getWidth(),
-		// (int) videoSize.getHeight(), BufferedImage.TYPE_3BYTE_BGR);
 		File file = new File("user.properties");
 		FileInputStream fis;
 		try {
@@ -241,8 +228,10 @@ class MediaReader implements Runnable {
 
 	// 每次录制的完成
 	public void finish() {
-		Webcam.getWebcams().get(1).removeWebcamListener(doubleScreenVideo);
-		Webcam.getWebcams().get(1).removeWebcamListener(singleScreenVideo);
+		Webcam.getWebcams().get(RecordConfig.get().getNoteWebcamIndex()).removeWebcamListener(doubleScreenVideo);
+		Webcam.getWebcams().get(RecordConfig.get().getNoteWebcamIndex()).removeWebcamListener(singleScreenVideo);
+		Webcam.getWebcams().get(RecordConfig.get().getHeadWebcamIndex()).removeWebcamListener(singleScreenVideo);
+		Webcam.getWebcams().get(RecordConfig.get().getHeadWebcamIndex()).removeWebcamListener(faceVideo);
 		record = false;
 		pauseFlag = false;
 		g = null;
@@ -278,14 +267,6 @@ class MediaReader implements Runnable {
 		videoName = videoSavePath + File.separator + System.currentTimeMillis()
 				+ "test.mp4";
 		IMediaWriter writer = ToolFactory.makeWriter(videoName);
-//		IRational ir2 = IRational.make(1000);
-//		ICodec coder = ICodec.findEncodingCodec(ICodec.ID.CODEC_ID_H264);
-//		writer.addVideoStream(0, 0, coder,ir2,
-//				(int) videoSize.getWidth(), (int) videoSize.getHeight());
-		
-//		 IStream stream = writer.getContainer().getStream(0);
-//         IStreamCoder coder1 = stream.getStreamCoder();
-//         coder1.setFrameRate(IRational.make(25.0));
 		
 		writer.addVideoStream(0, 0, ICodec.ID.CODEC_ID_H264,
 				(int) videoSize.getWidth(), (int) videoSize.getHeight());
@@ -307,16 +288,9 @@ class MediaReader implements Runnable {
 		try {
 			byte[] audioBuf = new byte[line.getBufferSize() / 5];
 			if (!config.isSingleRecording()) {
-				VideoListener faceVideo = new VideoListener(g, 0, 0, 240, 180);
-				Webcam.getWebcams().get(0).addWebcamListener(faceVideo);
+				Webcam.getWebcams().get(RecordConfig.get().getHeadWebcamIndex()).addWebcamListener(faceVideo);
 			}
 
-			// VideoListener secVideo = new VideoListener(g, 0, 240, 320, 240);
-			// // Webcam.getWebcams().get(1).addWebcamListener(secVideo);
-			//
-			// VideoListener secVideo1 = new VideoListener(g, 320, 90, 960,
-			// 540);
-			// Webcam.getWebcams().get(1).addWebcamListener(secVideo1);
 			line.start();
 			BufferedImage biy = null;
 			String[] themeArr = {"",""};
@@ -392,7 +366,7 @@ class MediaReader implements Runnable {
 				framerate = properties.getProperty("frameRate");
 			}
 			
-			int frameCount = (isNotEmpty(framerate) ? Integer.parseInt(framerate) : 50000);
+			int frameCount = (isNotEmpty(framerate) ? Integer.parseInt(framerate) : 100000);
 			while (record) {
 				while (pauseFlag) {
 					createVideo(writer, audioBuf, format, line,biy,themeArr,teacherArr,schoolArr,infoArr,water,img,frameCount);
@@ -401,10 +375,6 @@ class MediaReader implements Runnable {
 						break;
 					}
 					i++;
-					// if(i == 200){
-					// record = false;
-					// break;
-					// }
 				}
 				Thread.sleep(500);
 			}
@@ -436,21 +406,13 @@ class MediaReader implements Runnable {
 				g.drawString(infoArr[0], 80, 450);
 				g.drawString(infoArr[1], 80, 475);
 		}
-		//画水印
-//		Graphics2D g2 = (Graphics2D) g;
-//		g2.rotate(Math.toRadians(-45),(double) combined.getWidth() / 2, (double) combined.getHeight() / 2);
-//		Image img = ImageUtil.getInstance().getBufferedImage(
-//				"images/logo3.png");
-//		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,1f));
-//		g2.drawImage(img, 30, 600,null);
-//		g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER));
 		
-		IConverter converter = ConverterFactory.createConverter(combined,
-				IPixelFormat.Type.YUV420P);
-		IVideoPicture frame = converter.toPicture(combined,
-				line.getMicrosecondPosition());
-		frame.setKeyFrame(i == 0);
-		frame.setQuality(0);
+//		IConverter converter = ConverterFactory.createConverter(combined,
+//				IPixelFormat.Type.YUV420P);
+//		IVideoPicture frame = converter.toPicture(combined,
+//				line.getMicrosecondPosition());
+//		frame.setKeyFrame(i == 0);
+//		frame.setQuality(0);
 		
 
 		int nBytesRead = line.read(audioBuf, 0, audioBuf.length);
@@ -461,17 +423,24 @@ class MediaReader implements Runnable {
 		smp.put(audioBuf, 0, 0, nBytesRead);
 		smp.setComplete(true, numSample, (int) format.getSampleRate(), 1,
 				IAudioSamples.Format.FMT_S16, line.getMicrosecondPosition());
-		while(t1<line.getMicrosecondPosition()){
-			if(null != g){
-//				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
-				drawWater(g, water, img);
-			}
-			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
-			t1 += frameCount;
-		}
-//		t1 += 50000;
+//		while(t1<line.getMicrosecondPosition()){
+////			if(null != g){
+//////				g.drawImage(img, 600, 600, new Color(255,255,0,0), null);
+////			}
+//			drawWater(g, water, img);
+//			writer.encodeVideo(0, combined,t1,Global.DEFAULT_TIME_UNIT);
+//			t1 += frameCount;
+//		}
 //		writer.encodeVideo(0, frame);
+		writer.encodeVideo(0, combined, t1, Global.DEFAULT_TIME_UNIT);
+		t1 += frameCount;
 		writer.encodeAudio(1, smp);
+//		try {
+//			Thread.sleep(100);
+//		} catch (InterruptedException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		}
 	}
 
 	private long t1 = 0;
@@ -492,32 +461,50 @@ class MediaReader implements Runnable {
 	// 实现画面的切
 	void changeVideo() {
 		if (config.isChangeFlag()) {
+			int headIndex = RecordConfig.get().getHeadWebcamIndex();
+			int noteIndex = RecordConfig.get().getNoteWebcamIndex();
+//			Webcam webcam = Webcam.getWebcams().get(noteIndex);
+//			WebcamListener[] w = webcam.getWebcamListeners();
+//			System.out.println(w);
+//			System.out.println(webcam.getWebcamListenersCount());
+//			if(w.length>0){
+//				System.out.println(webcam.removeWebcamListener(w[0]));
+//			}
+//			System.out.println(webcam.getWebcamListenersCount());
 			// 单瓶切换
 			if (config.isSingleRecording()) {
 				if (config.isFaceRecording()) {
-					Webcam.getWebcams().get(1)
-							.removeWebcamListener(singleScreenVideo);
-					Webcam.getWebcams().get(0)
-							.addWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.removeWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(0)
+//							.addWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(noteIndex).removeWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(headIndex).addWebcamListener(singleScreenVideo);
 				} else if (config.isNoteRecording()) {
-					Webcam.getWebcams().get(0)
-							.removeWebcamListener(singleScreenVideo);
-					Webcam.getWebcams().get(1)
-							.addWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(0)
+//							.removeWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.addWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(headIndex).removeWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(noteIndex).addWebcamListener(singleScreenVideo);
 				} else if (config.isScreenRecording()) {
-					Webcam.getWebcams().get(0)
-							.removeWebcamListener(singleScreenVideo);
-					Webcam.getWebcams().get(1)
-							.removeWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(0)
+//							.removeWebcamListener(singleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.removeWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(headIndex).removeWebcamListener(singleScreenVideo);
+					Webcam.getWebcams().get(noteIndex).removeWebcamListener(singleScreenVideo);
 				}
 			} else {
 				// 双屏切换
 				if (config.isNoteRecording()) {
-					Webcam.getWebcams().get(1)
-							.addWebcamListener(doubleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.addWebcamListener(doubleScreenVideo);
+					Webcam.getWebcams().get(noteIndex).addWebcamListener(doubleScreenVideo);
 				} else {
-					Webcam.getWebcams().get(1)
-							.removeWebcamListener(doubleScreenVideo);
+//					Webcam.getWebcams().get(1)
+//							.removeWebcamListener(doubleScreenVideo);
+					Webcam.getWebcams().get(noteIndex).removeWebcamListener(doubleScreenVideo);
 				}
 			}
 			// changeFlag = false;
@@ -527,12 +514,12 @@ class MediaReader implements Runnable {
 
 	// 初始化状态参数
 	void initParam() {
-		// faceVideo = new VideoListener(g, 0, 210, 240, 180);
-		otherVideo = new VideoListener(g, 0, 210, 240, 180);
+		faceVideo = new VideoListener(g, 0, 0, 320, 240);
+//		otherVideo = new VideoListener(g, 0, 210, 240, 180);
 		singleScreenVideo = new VideoListener(g, 0, 0,
 				config.getVideoSize().width, config.getVideoSize().height);
-		doubleScreenVideo = new VideoListener(g, 245, 0,
-				config.getVideoSize().width, config.getVideoSize().height);
+		doubleScreenVideo = new VideoListener(g, 325, 0,
+				800, 600);
 		// 录制状态
 		record = true;
 		// 暂停状态
@@ -932,6 +919,109 @@ class MediaWriter implements Runnable{
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+	}
+	
+}
+
+
+
+
+
+class MakerVideo2 implements Runnable{
+
+	@Override
+	public void run() {
+		File file = new File("test.mp4");
+
+		IMediaWriter writer = ToolFactory.makeWriter(file.getName());
+		Dimension size = WebcamResolution.VGA.getSize();
+
+		writer.addVideoStream(0, 0, ICodec.ID.CODEC_ID_H264, size.width, size.height);
+
+		Webcam webcam = Webcam.getWebcams().get(0);
+//		webcam.setViewSize(size);
+		webcam.open(true);
+
+		long start = System.currentTimeMillis();
+		BufferedImage combined = new BufferedImage((int) 1200,
+				(int) 800, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics g = combined.getGraphics();
+		for (int i = 0; i < 500; i++) {
+
+			System.out.println("Capture frame " + i);
+BufferedImage bufferedImage = webcam.getImage();
+g.drawImage(bufferedImage, 0, 0, 320, 240, null);
+			BufferedImage image = ConverterFactory.convertToType(bufferedImage, BufferedImage.TYPE_3BYTE_BGR);
+			IConverter converter = ConverterFactory.createConverter(image, IPixelFormat.Type.YUV420P);
+
+			IVideoPicture frame = converter.toPicture(image, (System.currentTimeMillis() - start) * 1000);
+			frame.setKeyFrame(i == 0);
+			frame.setQuality(0);
+
+			writer.encodeVideo(0, frame);
+
+			// 10 FPS
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		writer.close();
+
+		System.out.println("Video recorded in file: " + file.getAbsolutePath());
+	}
+	
+}
+
+class MakerVideo3 implements Runnable{
+
+	@Override
+	public void run() {
+		File file = new File("test1.mp4");
+
+		IMediaWriter writer = ToolFactory.makeWriter(file.getName());
+		Dimension size = WebcamResolution.VGA.getSize();
+
+		writer.addVideoStream(0, 0, ICodec.ID.CODEC_ID_H264, size.width, size.height);
+
+		Webcam webcam = Webcam.getWebcams().get(1);
+		webcam.setViewSize(size);
+		webcam.open(true);
+
+		long start = System.currentTimeMillis();
+		BufferedImage combined = new BufferedImage((int) 1200,
+				(int) 800, BufferedImage.TYPE_3BYTE_BGR);
+		Graphics g = combined.getGraphics();
+		for (int i = 0; i < 500; i++) {
+
+			System.out.println("Capture frame " + i);
+			BufferedImage bufferedImage = webcam.getImage();
+			g.drawImage(bufferedImage, 0, 0, 320, 240, null);
+
+			BufferedImage image = ConverterFactory.convertToType(bufferedImage, BufferedImage.TYPE_3BYTE_BGR);
+			IConverter converter = ConverterFactory.createConverter(image, IPixelFormat.Type.YUV420P);
+
+			IVideoPicture frame = converter.toPicture(image, (System.currentTimeMillis() - start) * 1000);
+			frame.setKeyFrame(i == 0);
+			frame.setQuality(0);
+
+			writer.encodeVideo(0, frame);
+
+			// 10 FPS
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+
+		writer.close();
+
+		System.out.println("Video recorded in file: " + file.getAbsolutePath());
 	}
 	
 }

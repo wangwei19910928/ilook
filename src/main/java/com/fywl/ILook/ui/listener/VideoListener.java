@@ -55,7 +55,30 @@ public class VideoListener implements WebcamListener {
 	public void webcamImageObtained(WebcamEvent we) {
 		if (g != null) {
 			BufferedImage image = ConverterFactory.convertToType(we.getImage(), BufferedImage.TYPE_3BYTE_BGR);
-			g.drawImage(image, x, y, width, height, null);
+			
+			BufferedImage bufferedimage = image;
+			
+//			int w = bufferedimage.getWidth();
+//            int h = bufferedimage.getHeight();
+//            int[][] datas = new int[w][h];
+//            for (int i = 0; i < h; i++) {
+//                for (int j = 0; j < w; j++) {
+//                    datas[j][i] = bufferedimage.getRGB(j, i);
+//                }
+//            }
+//            int[][] tmps = new int[w][h];
+//            for (int i = 0; i < h; i++) {
+//                for (int j = 0, b = w - 1; j < w; j++, b--) {
+//                    tmps[b][i] = datas[j][i];
+//                }
+//            }
+//            for (int i = 0; i < h; i++){
+//                for (int j = 0; j<w ;j++){
+//                    bufferedimage.setRGB(j, i, tmps[j][i]);
+//                }
+//            }
+			
+			g.drawImage(bufferedimage, x, y, width, height, null);
 //			g.drawImage(image, 0, 0, width, height, width, 0, 0, height, null);
 //			Graphics2D g2d = (Graphics2D)g;  
 //	        g2d.rotate(180,width/2,height/2);  

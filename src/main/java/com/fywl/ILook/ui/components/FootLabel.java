@@ -20,6 +20,7 @@ public class FootLabel extends Composite {
 				Constants.FOOT_LABEL_Constant.VERSION_LOCATION);
 		v.setForeground(SWTResourceManager
 				.getColor(Constants.FOOT_LABEL_Constant.VERSION_COLOR));
+		v.setFont(SWTResourceManager.getFont(".Helvetica Neue DeskInterface", 10, SWT.BOLD));
 		Label w = new MyLabel(this, SWT.NONE,
 				Constants.Shell_Constant.WEBSITE,
 				Constants.FOOT_LABEL_Constant.WEBSITE_LOCATION);

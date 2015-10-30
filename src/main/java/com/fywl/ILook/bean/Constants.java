@@ -7,7 +7,7 @@ public class Constants {
 	public interface Shell_Constant {
 		public int WIDTH = 500;
 		public int HEIGHT = 440;
-		public String TRAY_URL = "images/record.png";
+		public String TRAY_URL = "images/logo.png";
 		// 背景颜色
 		public int[] BACKGROUND = { 60, 131, 209 };
 		//网站主页
@@ -35,7 +35,7 @@ public class Constants {
 		// logo位置信息
 		public int[] LOGO_LOCATION = { 0, 0, 60, 30 };
 		// logo图片位置
-		public String LOGO_URL = "/images/logo3.png";
+		public String LOGO_URL = "/images/logo.png";
 		// 关闭按钮位置信息
 		public int[] CLOSE_LOCATION = { 470, 0, 30, 30 };
 		// 关闭按钮图片位置
@@ -123,7 +123,7 @@ public class Constants {
 		// 背景颜色
 		public int[] BACKGROUND = { 60, 131, 209 };
 		// 版本信息
-		public int[] VERSION_LOCATION = { 0, 0, 250, 30 };
+		public int[] VERSION_LOCATION = { 0, 3, 250, 30 };
 		public String VERSION_CONTENT = "爱录课V2015.1.0";
 		public int VERSION_COLOR = SWT.COLOR_WHITE;
 		// 网站信息
@@ -151,8 +151,8 @@ public class Constants {
 		// 登录按钮位置
 		public int[] LOGIN_LOCATION = { 192, 170, 200, 40 };
 		// 登录请求url
-//		public String HTTP_LOGIN_URL = "http://192.168.18.6:8080/check";
-		public String HTTP_LOGIN_URL = "http://114.215.123.52:8888/MicroClassWeb/check";
+		public String HTTP_LOGIN_URL = "http://192.168.18.6:8080/check";
+//		public String HTTP_LOGIN_URL = "http://114.215.123.52:8888/MicroClassWeb/check";
 	}
 
 	// 上传时候的常量
@@ -174,7 +174,7 @@ public class Constants {
 		public String[] water_location_value = {"1","2","3","4"};
 		public String[] color = {"蓝色","黑色"};
 		public String[] color_value = {"255","1"};
-		public String[] frame_rate = {"20","25"};
-		public String[] frame_rate_value = {"50000","40000"};
+		public String[] frame_rate = {"10","20","25"};
+		public String[] frame_rate_value = {"100000","50000","40000"};
 	}
 }

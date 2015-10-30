@@ -42,18 +42,20 @@ public class VideoPlayBackPanel extends Composite {
 		//脸部摄像头
 		case 0:
 			Integer i = RecordConfig.get().getHeadWebcamIndex();
-			if(null != i){
-				if(i<=maxIndex){
-					wb = Webcam.getWebcams().get(i);
-				}
+			if(null != i && i<maxIndex){
+				wb = Webcam.getWebcams().get(i);
+			}else{
+				wb = Webcam.getWebcams().get(0);
+				RecordConfig.get().setHeadWebcamIndex(0);
 			}
 			break;
 		case 1:
 			Integer i1 = RecordConfig.get().getNoteWebcamIndex();
-			if(null != i1){
-				if(i1<=maxIndex){
-					wb = Webcam.getWebcams().get(i1);
-				}
+			if(null != i1 && i1<maxIndex){
+				wb = Webcam.getWebcams().get(i1);
+			}else{
+				wb = Webcam.getWebcams().get(1);
+				RecordConfig.get().setNoteWebcamIndex(1);
 			}
 			break;
 
@@ -71,10 +73,10 @@ public class VideoPlayBackPanel extends Composite {
 			};
 			webcam.setCustomViewSizes(nonStandardResolutions);
 //			webcam.setViewSize(size);
-			if(1 == index){
-				webcam.setViewSize(new Dimension(2048, 1536));
-				mirrored = true;
-			}
+//			if(1 == index){
+//				webcam.setViewSize(new Dimension(2048, 1536));
+//				mirrored = true;
+//			}
 			
 		}
 		init();
@@ -91,6 +93,7 @@ public class VideoPlayBackPanel extends Composite {
 
 	public void start() {
 		if (webcam != null) {
+			System.out.println(size);
 			webcam.setViewSize(size);
 			root.getContentPane().removeAll();
 			panel = new WebcamPanel(webcam, webcam.getViewSize(), false);
@@ -100,6 +103,7 @@ public class VideoPlayBackPanel extends Composite {
 			frame.setVisible(true);
 			panel.start();
 			running = true;
+			System.out.println(webcam.getViewSize());
 		}
 		
 //		if (webcam != null) {

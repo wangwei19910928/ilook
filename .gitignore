@@ -1,3 +1,4 @@
-﻿/target/*
-/.settings/
-/.git/
+﻿!pom.xml
+!template.vm
+!keystore
+!/src/main
